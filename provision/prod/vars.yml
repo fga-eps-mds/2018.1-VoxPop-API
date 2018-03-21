@@ -1,0 +1,25 @@
+---
+project_name: voxpop_api
+project_user: ubuntu
+
+wsgi_module: hello.wsgi
+
+install_root: /home/ubuntu
+pythonpath: "{{ install_root }}/{{ project_name }}/{{ project_env }}/bin/python3"
+static_root: "{{ install_root }}/{{ project_name }}/static"
+
+repository_url: https://github.com/fga-gpp-mds/2018.1-VoxPop-API
+ssh_private_key: ~/.ssh/id_rsa
+
+server_name: 127.0.0.1
+server_name_alternative: localhost
+server_port: 8000
+
+db_name: medigadb
+db_user: medigadbuser
+db_password: HAWCqLGtG2Zy
+
+system_packages:
+  - git
+  - docker
+  - docker-compose

@@ -1,0 +1,56 @@
+---
+- hosts: "{{ install_root }}/{{ project_name }}/provision/hosts"
+  gather_facts: false
+  become: yes
+
+  tasks:
+    - name: Install system packages
+      apt:
+        pkg: "{{ item }}"
+        update-cache: yes
+      with_items: "{{ system_packages }}"
+
+    - name: Clean repository directory
+      file:
+        state: absent
+        path: "{{ install_root }}/{{ project_name }}"
+
+    - name: Clone/pull project repo
+      git:
+        repo: "{{ repository_url }}"
+        dest: "{{ install_root }}/{{ project_name }}"
+        accept_hostkey: yes
+        force: yes
+
+    # - name: Apply django configuration
+    #   template:
+    #     src: settings.j2
+    #     dest: "{{ install_root }}/{{ project_name }}/{{ project_name }}/settings.py"
+
+    # Run environment
+    - name: Creating/restarting containers
+      docker_service:
+        project_src: "{{ install_root }}/{{ project_name }}/provision/prod"
+        build: yes
+        restarted: yes
+        state: present
+
+    # - name: Make django migrations
+    #   django_manage:
+    #     command: "makemigrations message user"
+    #     app_path: "{{ install_root }}/{{ project_name }}"
+    #     virtualenv: "{{ install_root }}/{{ project_name }}/mdenv"
+    #
+    # - name: Apply django migrations
+    #   django_manage:
+    #     command: migrate
+    #     app_path: "{{ install_root }}/{{ project_name }}"
+    #     virtualenv: "{{ install_root }}/{{ project_name }}/mdenv"
+    #
+    # - name: Collect project static files
+    #   django_manage:
+    #     command: collectstatic
+    #     app_path: "{{ install_root }}/{{ project_name }}"
+    #     virtualenv: "{{ install_root }}/{{ project_name }}/mdenv"
+
+    # Check if is running

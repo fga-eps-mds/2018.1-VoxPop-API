@@ -1,0 +1,108 @@
+---
+- hosts: mediga_dev
+  vars_files:
+    - vars.yml
+  gather_facts: false
+  become: yes
+
+  tasks:
+    - name: Clone/pull project repo
+      git:
+        repo: "{{ project_repo }}"
+        dest: "{{ install_root }}/{{ project_name }}"
+        accept_hostkey: yes
+        force: yes
+
+    - name: Install virtualenv
+      pip:
+        name: virtualenv
+        executable: /usr/bin/pip3
+
+    - name: Install python packages
+      pip:
+        requirements: "{{ install_root }}/{{ project_name }}/requirements.txt"
+        virtualenv: "{{ install_root }}/{{ project_name }}/mdenv"
+
+    - name: Install gulp script dependencies
+      npm:
+        path: "{{ install_root }}/{{ project_name }}"
+
+    - name: Minify css and js
+      command: npm run gulp
+      args:
+        chdir: "{{ install_root }}/{{ project_name }}"
+
+    - name: Apply gunicorn configuration
+      template:
+        src: gunicorn.j2
+        dest: /etc/systemd/system/gunicorn.service
+
+    - name: Apply nginx configuration
+      template:
+        src: nginx.j2
+        dest: "/etc/nginx/sites-available/{{ project_name }}"
+
+    - name: Delete nginx enabled site
+      file:
+        dest: "/etc/nginx/sites-enabled/{{ project_name }}"
+        state: absent
+
+    - name: Enable nginx configuration
+      file:
+        src: "/etc/nginx/sites-available/{{ project_name }}"
+        dest: "/etc/nginx/sites-enabled/{{ project_name }}"
+        state: link
+        force: yes
+
+    - name: Apply django configuration
+      template:
+        src: settings.j2
+        dest: "{{ install_root }}/{{ project_name }}/{{ project_name }}/settings.py"
+
+    - name: Make django migrations
+      django_manage:
+        command: "makemigrations message user"
+        app_path: "{{ install_root }}/{{ project_name }}"
+        virtualenv: "{{ install_root }}/{{ project_name }}/mdenv"
+
+    - name: Apply django migrations
+      django_manage:
+        command: migrate
+        app_path: "{{ install_root }}/{{ project_name }}"
+        virtualenv: "{{ install_root }}/{{ project_name }}/mdenv"
+
+    - name: Collect project static files
+      django_manage:
+        command: collectstatic
+        app_path: "{{ install_root }}/{{ project_name }}"
+        virtualenv: "{{ install_root }}/{{ project_name }}/mdenv"
+
+    - name: "Give all files permission to {{ project_user }}"
+      file:
+        dest: "{{ install_root }}"
+        state: directory
+        recurse: yes
+        owner: "{{ project_user }}"
+        group: "{{ project_user }}"
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: Check if nginx is running
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Restart gunicorn
+      service:
+        name: gunicorn
+        state: restarted
+
+    - name: Check if gunicorn is running
+      service:
+        name: gunicorn
+        state: started
+        enabled: yes
