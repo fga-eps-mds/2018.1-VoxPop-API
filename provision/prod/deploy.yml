@@ -1,7 +1,8 @@
 ---
-- hosts: api_prod
+- hosts: "api_{{ env }}"
   vars_files:
     - vars.yml
+    - "{{ install_root }}/.credentials/db.yml"
   gather_facts: false
   become: yes
 
@@ -17,47 +18,45 @@
         state: absent
         path: "{{ install_root }}/{{ project_name }}"
 
-    - name: Clone/pull project repo
+    - name: Clone/pull project repository
       git:
         repo: "{{ repository_url }}"
+        version: master
         dest: "{{ install_root }}/{{ project_name }}"
         accept_hostkey: yes
         force: yes
 
-    # - name: Apply django configuration
-    #   template:
-    #     src: settings.j2
-    #     dest: "{{ install_root }}/{{ project_name }}/{{ project_name }}/settings.py"
+    - name: Apply Django configuration
+      template:
+        src: settings.j2
+        dest: "{{ install_root }}/{{ project_name }}/{{ project_name }}/settings.py"
 
-    # Run environment
-    - name: Rebuild api image
-      command: docker-compose -f provision/prod/docker-compose.yml build
+    - name: Rebuild application image
+      command: "docker-compose -f provision/{{ env }}/docker-compose.yml build"
       become: true
       args:
         chdir: "{{ install_root }}/{{ project_name }}"
 
-    - name: Create containers
-      command: docker-compose -f provision/prod/docker-compose.yml up -d
+    - name: Create/recreate all application containers
+      command: "docker-compose -f provision/{{ env }}/docker-compose.yml up -d --force-recreate"
       become: true
       args:
         chdir: "{{ install_root }}/{{ project_name }}"
 
-    # - name: Make django migrations
-    #   django_manage:
-    #     command: "makemigrations message user"
-    #     app_path: "{{ install_root }}/{{ project_name }}"
-    #     virtualenv: "{{ install_root }}/{{ project_name }}/mdenv"
-    #
-    # - name: Apply django migrations
-    #   django_manage:
-    #     command: migrate
-    #     app_path: "{{ install_root }}/{{ project_name }}"
-    #     virtualenv: "{{ install_root }}/{{ project_name }}/mdenv"
-    #
-    # - name: Collect project static files
-    #   django_manage:
-    #     command: collectstatic
-    #     app_path: "{{ install_root }}/{{ project_name }}"
-    #     virtualenv: "{{ install_root }}/{{ project_name }}/mdenv"
+    - name: Make Django migrations
+      command: "docker-compose -f provision/{{ env }}/docker-compose.yml exec -d api python3 manage.py makemigrations"
+      become: true
+      args:
+        chdir: "{{ install_root }}/{{ project_name }}"
 
-    # Check if is running
+    - name: Apply Django migrations
+      command: "docker-compose -f provision/{{ env }}/docker-compose.yml exec -d api python3 manage.py migrate"
+      become: true
+      args:
+        chdir: "{{ install_root }}/{{ project_name }}"
+
+    - name: Collect project static files
+      command: "docker-compose -f provision/{{ env }}/docker-compose.yml exec -d api python3 manage.py collectstatic --noinput"
+      become: true
+      args:
+        chdir: "{{ install_root }}/{{ project_name }}"

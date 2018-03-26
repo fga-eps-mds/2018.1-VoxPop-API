@@ -7,7 +7,7 @@ services:
         - ../.././db/psql:/var/lib/postgresql/data:rw
   api:
     build: ../../.
-    command: bash -c "chmod +x provision/prod/run.sh && ./provision/prod/run.sh"
+    command: bash -c "chmod +x provision/hml/run.sh && ./provision/hml/run.sh"
     volumes:
       - ../../.:/code
       - /static:/static
