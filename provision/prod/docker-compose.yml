@@ -6,9 +6,9 @@ services:
     volumes:
         - ./db/psql:/var/lib/postgresql/data:rw
   api:
-    build: ../.
+    build: ../../.
     # command: python3 manage.py runserver 0.0.0.0:8000
-    command: /bin/sh scripts/dev/wait-for-postgres.sh
+    command: bash -c "chmod +x run.sh && ./run.sh"
     volumes:
       - .:/code
       - /static:/static

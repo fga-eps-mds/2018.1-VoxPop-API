@@ -1,5 +1,7 @@
 ---
-- hosts: "{{ install_root }}/{{ project_name }}/provision/hosts"
+- hosts: api_prod
+  vars_files:
+    - vars.yml
   gather_facts: false
   become: yes
 
@@ -28,12 +30,17 @@
     #     dest: "{{ install_root }}/{{ project_name }}/{{ project_name }}/settings.py"
 
     # Run environment
-    - name: Creating/restarting containers
-      docker_service:
-        project_src: "{{ install_root }}/{{ project_name }}/provision/prod"
-        build: yes
-        restarted: yes
-        state: present
+    - name: Rebuild api image
+      command: docker-compose build -f provision/prod/docker-compose.yml
+      become: true
+      args:
+        chdir: "{{ install_root }}/{{ project_name }}"
+
+    - name: Create containers
+      command: docker-compose up -d -f provision/prod/docker-compose.yml
+      become: true
+      args:
+        chdir: "{{ install_root }}/{{ project_name }}"
 
     # - name: Make django migrations
     #   django_manage:
