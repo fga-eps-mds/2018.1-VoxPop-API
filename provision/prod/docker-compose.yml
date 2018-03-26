@@ -4,13 +4,13 @@ services:
   db:
     image: postgres
     volumes:
-        - ./db/psql:/var/lib/postgresql/data:rw
+        - ../.././db/psql:/var/lib/postgresql/data:rw
   api:
     build: ../../.
     # command: python3 manage.py runserver 0.0.0.0:8000
-    command: bash -c "chmod +x run.sh && ./run.sh"
+    command: bash -c "chmod +x provision/prod/run.sh && ./provision/prod/run.sh"
     volumes:
-      - .:/code
+      - ../../.:/code
       - /static:/static
     expose:
       - "8000"
@@ -21,8 +21,8 @@ services:
     ports:
       - "80:8000"
     volumes:
-      - .:/code
-      - ./nginx:/etc/nginx/conf.d
+      - ../../.:/code
+      - ../.././nginx:/etc/nginx/conf.d
       - /static:/static
     depends_on:
       - api
