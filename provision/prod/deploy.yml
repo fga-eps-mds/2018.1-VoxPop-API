@@ -31,13 +31,13 @@
 
     # Run environment
     - name: Rebuild api image
-      command: docker-compose build -f provision/prod/docker-compose.yml
+      command: docker-compose -f provision/prod/docker-compose.yml build
       become: true
       args:
         chdir: "{{ install_root }}/{{ project_name }}"
 
     - name: Create containers
-      command: docker-compose up -d -f provision/prod/docker-compose.yml
+      command: docker-compose -f provision/prod/docker-compose.yml up -d
       become: true
       args:
         chdir: "{{ install_root }}/{{ project_name }}"
