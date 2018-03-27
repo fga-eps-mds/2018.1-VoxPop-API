@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  api:
+    build: ../../.
+    command: bash -c "chmod +x provision/scripts/run-dev.sh && ./provision/scripts/run-dev.sh"
+    volumes:
+      - ../../.:/code
+      - /static:/static
+    ports:
+      - "8000:8000"
