@@ -4,7 +4,7 @@ services:
   db:
     image: postgres
     volumes:
-        - ../.././db/psql:/var/lib/postgresql/data:rw
+        - ../../postgres-data:/var/lib/postgresql/data:rw
   api:
     build: ../../.
     command: bash -c "chmod +x provision/scripts/run.sh && ./provision/scripts/run.sh"
