@@ -45,15 +45,17 @@ EDUCATION_CHOICES = (
 )
 
 
-class SocioeconomicInformation(models.Model):
+class SocialInformation(models.Model):
 
     owner = models.OneToOneField(
         User,
         on_delete=models.CASCADE
     )
-    state = models.CharField(choices=UF_CHOICES, default='AC')
-    city = models.CharField(max_length=150, blank=True)
-    income = models.DecimalField(min_value=0)
-    education = models.CharField(choices=EDUCATION_CHOICES, default='EFC')
-    job = models.CharField(max_length=100, blank=True)
-    age = models.IntegerField(min_value=0, max_value=250)
+    state = models.CharField(max_length=150, choices=UF_CHOICES, default='AC'),
+    city = models.CharField(max_length=150, blank=True),
+    income = models.DecimalField(decimal_places=2, max_digits=9),
+    education = models.CharField(
+        max_length=150, choices=EDUCATION_CHOICES, default='EFC'
+    ),
+    job = models.CharField(max_length=100, blank=True),
+    age = models.IntegerField()

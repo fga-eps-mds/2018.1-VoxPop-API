@@ -1,3 +1,7 @@
-# from django.shortcuts import render
-
-# Create your views here.
+# # from django.shortcuts import render
+# from .models import SocialInformation
+# from
+# # Create your views here.
+#
+#
+# class SocioeconomicInformationViewSet
