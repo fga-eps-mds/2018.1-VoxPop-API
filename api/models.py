@@ -51,11 +51,11 @@ class SocialInformation(models.Model):
         User,
         on_delete=models.CASCADE
     )
-    state = models.CharField(max_length=150, choices=UF_CHOICES, default='AC'),
-    city = models.CharField(max_length=150, blank=True),
-    income = models.DecimalField(decimal_places=2, max_digits=9),
+    state = models.CharField(max_length=150, choices=UF_CHOICES, default='AC')
+    city = models.CharField(max_length=150, blank=True)
+    income = models.DecimalField(decimal_places=2, max_digits=9)
     education = models.CharField(
         max_length=150, choices=EDUCATION_CHOICES, default='EFC'
-    ),
-    job = models.CharField(max_length=100, blank=True),
+    )
+    job = models.CharField(max_length=100, blank=True)
     birth_date = models.DateField()

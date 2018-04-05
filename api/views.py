@@ -16,12 +16,12 @@ class SocialInformationViewset(ModelViewSet):
     def create(self, request):
         return super(SocialInformationViewset, self).create(request)
 
-    def destroy(self, request, id=None):
-        response = super(SocialInformationViewset, self).destroy(request, id)
+    def destroy(self, request, pk=None):
+        response = super(SocialInformationViewset, self).destroy(request, pk)
         return response
 
-    def retrieve(self, request, id=None):
-        response = super(SocialInformationViewset, self).retrieve(request, id)
+    def retrieve(self, request, pk=None):
+        response = super(SocialInformationViewset, self).retrieve(request, pk)
         return response
 
 
@@ -36,10 +36,10 @@ class UserViewset(ModelViewSet):
     def create(self, request):
         return super(UserViewset, self).create(request)
 
-    def destroy(self, request, id=None):
-        response = super(UserViewset, self).destroy(request, id)
+    def destroy(self, request, pk=None):
+        response = super(UserViewset, self).destroy(request, pk)
         return response
 
-    def retrieve(self, request, id=None):
-        response = super(UserViewset, self).retrieve(request, id)
+    def retrieve(self, request, pk=None):
+        response = super(UserViewset, self).retrieve(request, pk)
         return response

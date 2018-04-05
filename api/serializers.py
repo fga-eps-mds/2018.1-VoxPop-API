@@ -33,5 +33,5 @@ class SocialInformationSerializer(serializers.ModelSerializer):
             'income',
             'education',
             'job',
-            'age',
+            'birth_date',
         ]
