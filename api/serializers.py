@@ -7,6 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            'id',
             'username',
             'first_name',
             'last_name',
@@ -25,6 +26,7 @@ class SocialInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = SocialInformation
         fields = [
+            'id',
             'owner',
             'state',
             'city',
