@@ -1,8 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import EmailValidator
-from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 UF_CHOICES = (
@@ -34,18 +31,29 @@ UF_CHOICES = (
     ('TO', 'Tocantins')
 )
 
-class Users(User):
-    username_validator = UnicodeUsernameValidator()
-    email_validator = EmailValidator()
-    username_field = models.CharField(
-        max_length = 50,
-        validators = [username_validator],
+EDUCATION_CHOICES = (
+    ('EFC', 'Ensino Fundamental Completo'),
+    ('EFI', 'Ensino Fundamental Incompleto'),
+    ('EMC', 'Ensino Médio Completo'),
+    ('EMI', 'Ensino Médio Incompleto'),
+    ('ESC', 'Ensino Superior Completo'),
+    ('ESI', 'Ensino Superior Incompleto'),
+    ('PG', 'Pós-Graduação'),
+    ('ME', 'Mestrado'),
+    ('DO', 'Doutorado'),
+    ('PD', 'Pós-Doutorado')
+)
+
+
+class SocioeconomicInformation(models.Model):
+
+    owner = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
     )
-    email_field = models.EmailField(
-        max_length = 150,
-        validators = [email_validator],
-    )
-    state = models.CharField(max_length=20, choices=UF_CHOICES, default='AC')
+    state = models.CharField(choices=UF_CHOICES, default='AC')
     city = models.CharField(max_length=150, blank=True)
-    USERNAME_FIELD = 'username_field'
-    EMAIL_FIELD = 'email_field'
+    income = models.DecimalField(min_value=0)
+    education = models.CharField(choices=EDUCATION_CHOICES, default='EFC')
+    job = models.CharField(max_length=100, blank=True)
+    age = models.IntegerField(min_value=0, max_value=250)
