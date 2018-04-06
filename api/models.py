@@ -54,7 +54,7 @@ class SocialInformation(models.Model):
     )
     state = models.CharField(max_length=150, choices=UF_CHOICES, default='AC')
     city = models.CharField(max_length=150, blank=True)
-    income = models.DecimalField(decimal_places=2, max_digits=9)
+    income = models.DecimalField(default=0, decimal_places=2, max_digits=9)
     education = models.CharField(
         max_length=150, choices=EDUCATION_CHOICES, default='EFC'
     )

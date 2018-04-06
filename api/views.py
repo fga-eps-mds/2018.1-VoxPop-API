@@ -24,6 +24,17 @@ class SocialInformationViewset(ModelViewSet):
         response = super(SocialInformationViewset, self).retrieve(request, pk)
         return response
 
+    def partial_update(self, request, pk=None, **kwargs):
+        response = \
+          super(SocialInformationViewset,
+                self).partial_update(request, pk, **kwargs)
+        return response
+
+    def update(self, request, pk=None, **kwargs):
+        response = \
+          super(SocialInformationViewset, self).update(request, pk, **kwargs)
+        return response
+
 
 class UserViewset(ModelViewSet):
     serializer_class = UserSerializer
@@ -42,4 +53,14 @@ class UserViewset(ModelViewSet):
 
     def retrieve(self, request, pk=None):
         response = super(UserViewset, self).retrieve(request, pk)
+        return response
+
+    def partial_update(self, request, pk=None, **kwargs):
+        response = \
+          super(UserViewset, self).partial_update(request, pk, **kwargs)
+        return response
+
+    def update(self, request, pk=None, **kwargs):
+        response = \
+          super(UserViewset, self).update(request, pk, **kwargs)
         return response
