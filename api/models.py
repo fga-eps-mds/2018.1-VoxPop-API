@@ -50,6 +50,7 @@ class SocialInformation(models.Model):
 
     owner = models.OneToOneField(
         User,
+        related_name='social_information',
         on_delete=models.CASCADE
     )
     state = models.CharField(max_length=150, choices=UF_CHOICES, default='AC')

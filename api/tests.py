@@ -1,155 +1,125 @@
-from django.test import TestCase
+from django.test import Client
 from .models import SocialInformation
+from django.urls import include, path, reverse
 from django.contrib.auth.models import User
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIRequestFactory, APITestCase
 from .views import SocialInformationViewset, UserViewset
+from  rest_framework import serializers, status
+from django.utils.translation import ugettext_lazy as _
 # Create your tests here.
 
 
-class UserTests(TestCase):
+class UserTests(APITestCase):
+
+    def setUp(self):
+        """
+        This method will run before any test.
+        """
+
+        self.user = User.objects.create(
+            username='teste',
+            first_name='teste',
+            last_name='teste',
+            email='teste@teste.com',
+            password='teste'
+        )
+        self.url = '/api/users/'
+
+    def tearDown(self):
+        """
+        This method will run after any test.
+        """
+        self.user.delete()
 
     def test_create_user(self):
         """
+        Ensure we can create a user object.
+        """
+        response = self.client.get(self.url + str(self.user.pk) + '/')
+        new_user = User.objects.get(pk=self.user.pk)
+        self.assertEqual(response.status_code,  status.HTTP_200_OK)
+
+    def test_invalid_create_user(self):
+        """
+        Ensure we can't create a invalid user object.
+        """
+        data = {
+        'username':'updated',
+        'first_name':'teste',
+        'last_name':'teste',
+        'email':'erro',
+        'password':'teste'
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_user(self):
+        """
         Ensure we can create a new user object.
         """
-        request = APIRequestFactory().get("")
-        voxpop_user = User.objects.create(
-                        username='teste',
-                        first_name='teste',
-                        last_name='teste',
-                        email='teste@teste.com',
-                        password='teste'
-        )
-        user_detail = UserViewset.as_view(actions={'get': 'retrieve'})
-        response = user_detail(request, pk=voxpop_user.pk)
-        self.assertEqual(response.status_code, 200)
-
-    def test_delete_user(self):
-        """
-        Ensure we can destroy a user object.
-        """
-        request = APIRequestFactory().get("")
-        voxpop_user = User.objects.create(
-                        username='teste',
-                        first_name='teste',
-                        last_name='teste',
-                        email='teste@teste.com',
-                        password='teste'
-        )
-        user_detail = UserViewset.as_view(actions={'get': 'retrieve'})
-        voxpop_user.delete()
-        response = user_detail(request, pk=voxpop_user.pk)
-        self.assertEqual(response.status_code, 404)
-
-    def test_update_user(self):
-        """
-        Ensure we can update a user object.
-        """
-        request = APIRequestFactory().get("")
-        voxpop_user = User.objects.create(
-                        username='teste',
-                        first_name='teste',
-                        last_name='teste',
-                        email='teste@teste.com',
-                        password='teste'
-        )
-        user_pk = voxpop_user.pk
-        voxpop_user = User.objects.update(
-                username='teste',
-                first_name='teste',
-                last_name='silverson',
-                email='teste@teste.com',
-                password='teste'
-        )
-        user_detail = UserViewset.as_view(actions={'get': 'retrieve'})
-        response = user_detail(request, pk=user_pk)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(self.user.username, 'teste')
+        data = {
+            'username':'updated',
+            'first_name':'teste',
+            'last_name':'teste',
+            'email':'teste@teste.com',
+            'password':'teste'
+        }
+        response = self.client.put(self.url + str(self.user.pk) + '/', data)
 
 
-class SocialInformationTests(TestCase):
-    def test_create_social_information(self):
-        """
-        Ensure we can create a new social information object.
-        """
-        request = APIRequestFactory().get("")
-        voxpop_user = User.objects.create(
-                        username='teste',
-                        first_name='teste',
-                        last_name='teste',
-                        email='teste@teste.com',
-                        password='teste'
-        )
-        social_information = SocialInformation.objects.create(
-                        owner=voxpop_user,
-                        state='AC',
-                        city='Rio Branco',
-                        income=1200,
-                        education='EFC',
-                        job='Atoa',
-                        birth_date='2018-02-03'
-        )
-        user_detail = SocialInformationViewset.as_view(actions={'get': 'retrieve'})
-        response = user_detail(request, pk=social_information.pk)
-        self.assertEqual(response.status_code, 200)
+        new_user = User.objects.get(pk=self.user.pk)
+        self.assertEqual(response.status_code,  status.HTTP_200_OK)
+        self.assertEqual(new_user.username, 'updated')
 
-    def test_delete_social_information(self):
+    def test_invalid_update_user(self):
         """
-        Ensure we can destroy a social information object.
+        Ensure we can't update a user object with invalid fields.
         """
-        request = APIRequestFactory().get("")
-        voxpop_user = User.objects.create(
-                        username='teste',
-                        first_name='teste',
-                        last_name='teste',
-                        email='teste@teste.com',
-                        password='teste'
-        )
-        social_information = SocialInformation.objects.create(
-                        owner=voxpop_user,
-                        state='AC',
-                        city='Rio Branco',
-                        income=1200,
-                        education='EFC',
-                        job='Atoa',
-                        birth_date='2018-02-03'
-        )
-        user_detail = SocialInformationViewset.as_view(actions={'get': 'retrieve'})
-        response = user_detail(request, pk=social_information.pk)
-        social_information.delete()
-        response = user_detail(request, pk=social_information.pk)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(self.user.username, 'teste')
+        data = {
+            'username':'updated',
+            'first_name':'teste',
+            'last_name':'teste',
+            'email':'erro',
+            'password':'teste'
+        }
+        response = self.client.put(self.url + str(self.user.pk) + '/', data)
 
-    def test_update_user(self):
+
+        new_user = User.objects.get(pk=self.user.pk)
+        self.assertEqual(response.status_code,  status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(
+            response.data,
+            {'email': [_('Enter a valid email address.')]}
+        )
+
+    def test_partial_update_user(self):
         """
-        Ensure we can update a social information object.
+        Ensure we can partially update a user object.
         """
-        request = APIRequestFactory().get("")
-        voxpop_user = User.objects.create(
-                        username='teste',
-                        first_name='teste',
-                        last_name='teste',
-                        email='teste@teste.com',
-                        password='teste'
+        self.assertEqual(self.user.email, 'teste@teste.com')
+        data = {
+            'email':'silverson@teste.com',
+        }
+        response = self.client.patch(self.url + str(self.user.pk) + '/', data)
+        new_user = User.objects.get(pk=self.user.pk)
+        self.assertEqual(response.status_code,  status.HTTP_200_OK)
+        self.assertEqual(new_user.email, 'silverson@teste.com')
+
+    def test_invalid_partial_update_user(self):
+        """
+        Ensure we can't partially update invalid information on a valid user
+        object.
+        """
+        self.assertEqual(self.user.email, 'teste@teste.com')
+        data = {
+            'email':'silverson',
+        }
+        response = self.client.patch(self.url + str(self.user.pk) + '/', data)
+        new_user = User.objects.get(pk=self.user.pk)
+        self.assertEqual(response.status_code,  status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(
+            response.data,
+            {'email': [_('Enter a valid email address.')]}
         )
-        social_information = SocialInformation.objects.create(
-                        owner=voxpop_user,
-                        state='AC',
-                        city='Rio Branco',
-                        income=1200,
-                        education='EFC',
-                        job='Atoa',
-                        birth_date='2018-02-03'
-        )
-        social_information_pk = social_information.pk
-        social_information = SocialInformation.objects.update(
-                owner=voxpop_user,
-                state='AC',
-                city='Rio Branco',
-                income=120,
-                education='EFC',
-                job='Atoa',
-                birth_date='2000-02-03'
-        )
-        user_detail = SocialInformationViewset.as_view(actions={'get': 'retrieve'})
-        response = user_detail(request, pk=social_information_pk)
-        self.assertEquals(response.status_code, 200)
