@@ -30,6 +30,7 @@ help:
 	@echo "			Exemplo: make startapp name=auth"
 	@echo "	makemigrations	Gerar migrations para o projeto"
 	@echo "	migrate		Aplicar migrations ao banco"
+	@echo "	test		Roda os testes da aplicação"
 	@echo "	collectstatic	Coletar arquivos estáticos"
 
 # Gerenciar docker
@@ -156,6 +157,13 @@ endif
 migrate:
 ifeq (${docker_status}, active)
 	@sudo docker-compose -f ${compose_file} exec api python3 manage.py migrate
+else
+	@echo "VoxPop: Serviço do Docker está inativo!"
+endif
+
+test:
+ifeq (${docker_status}, active)
+	@sudo docker-compose -f ${compose_file} exec api python3 manage.py test -v 2
 else
 	@echo "VoxPop: Serviço do Docker está inativo!"
 endif

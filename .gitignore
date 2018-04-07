@@ -1,3 +1,15 @@
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+migrations/
+
+# Others
+db.sqlite3
+.pylintrc
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

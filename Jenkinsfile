@@ -14,10 +14,14 @@ pipeline {
             steps {
                 sh '. /var/lib/jenkins/workspace/.virtualenvs/api/bin/activate'
                 sh '/var/lib/jenkins/workspace/.virtualenvs/api/bin/pip install -r requirements.txt'
+                sh '/var/lib/jenkins/workspace/.virtualenvs/api/bin/python3 manage.py makemigrations'
+                sh '/var/lib/jenkins/workspace/.virtualenvs/api/bin/python3 manage.py migrate'
+
             }
         }
         stage('Test') {
             steps {
+                sh "flake8 --exclude='manage.py, voxpopapi/settings.py, migrations, templates, */models.py, */tests.py, */admin.py, provision, nginx, docs, setup.py' ."
                 sh '/var/lib/jenkins/workspace/.virtualenvs/api/bin/python3 manage.py test'
             }
         }
