@@ -31,6 +31,11 @@
         src: settings.j2
         dest: "{{ install_root }}/{{ project_name }}/{{ project_name }}/settings.py"
 
+    - name: Apply init db script
+      template:
+        src: initdb.sh.j2
+        dest: "{{ install_root }}/{{ project_name }}/provision/scripts/db/initdb.sh"
+
     - name: Rebuild application image
       command: "docker-compose -f provision/{{ env }}/docker-compose.yml build"
       become: true

@@ -4,7 +4,8 @@ services:
   db:
     image: postgres
     volumes:
-        - ../../postgres-data:/var/lib/postgresql/data:rw
+        - ../../../data:/var/lib/postgresql/data:rw
+        - ../scripts/db:/docker-entrypoint-initdb.d:rw
   api:
     build: ../../.
     command: bash -c "chmod +x provision/scripts/run.sh && ./provision/scripts/run.sh"
