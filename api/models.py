@@ -53,7 +53,7 @@ class SocialInformation(models.Model):
         related_name='social_information',
         on_delete=models.CASCADE
     )
-    state = models.CharField(max_length=150, choices=UF_CHOICES, default='AC')
+    federal_unit = models.CharField(max_length=150, choices=UF_CHOICES, default='AC')
     city = models.CharField(max_length=150, blank=True)
     income = models.DecimalField(default=0, decimal_places=2, max_digits=9)
     education = models.CharField(
