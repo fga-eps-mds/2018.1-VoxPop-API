@@ -9,7 +9,7 @@ class SocialInformationSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'owner',
-            'state',
+            'federal_unit',
             'city',
             'income',
             'education',
