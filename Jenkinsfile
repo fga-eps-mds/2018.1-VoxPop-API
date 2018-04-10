@@ -14,8 +14,8 @@ pipeline {
             steps {
                 sh '. /var/lib/jenkins/workspace/.virtualenvs/api/bin/activate'
                 sh '/var/lib/jenkins/workspace/.virtualenvs/api/bin/pip install -r requirements.txt'
-                sh '/var/lib/jenkins/workspace/.virtualenvs/api/bin/python3 manage.py makemigrations'
-                sh '/var/lib/jenkins/workspace/.virtualenvs/api/bin/python3 manage.py migrate'
+                sh '/var/lib/jenkins/workspace/.virtualenvs/api/bin/python3 manage.py makemigrations --noinput'
+                sh '/var/lib/jenkins/workspace/.virtualenvs/api/bin/python3 manage.py migrate --noinput'
 
             }
         }
