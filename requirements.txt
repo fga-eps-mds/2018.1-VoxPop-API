@@ -4,3 +4,5 @@ django-rest-swagger
 psycopg2
 gunicorn
 pylint
+django-cors-headers
+
