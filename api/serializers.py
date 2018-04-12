@@ -1,6 +1,7 @@
 from .models import SocialInformation
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.db import models
 
 
 class SocialInformationSerializer(serializers.ModelSerializer):
@@ -31,6 +32,26 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'password',
             'social_information',
+        ]
+
+        extra_kwargs = {
+            'password': {
+                'write_only': True
+            },
+        }
+
+
+class UserLoginSerializer(serializers.ModelSerializer):
+    username = models.CharField()
+    email = models.EmailField()
+    token = models.CharField()
+
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'email',
+            'password',
         ]
 
         extra_kwargs = {
