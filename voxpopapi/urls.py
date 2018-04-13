@@ -18,6 +18,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(router.urls)),
     url(r'^api/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api/tokens/', views.obtain_auth_token),
+    url(r'^api/token_auth/', views.obtain_auth_token),
     url(r'^$', schema_view),
 ]

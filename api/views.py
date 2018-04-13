@@ -7,9 +7,10 @@ from .serializers import (
 from rest_framework.viewsets import ModelViewSet
 from django.contrib.auth.models import User
 from rest_framework import permissions
-from .permissions import IsOwnerOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
+from .permissions import IsOwnerOrReadOnly
 
 
 class SocialInformationViewset(ModelViewSet):
@@ -17,19 +18,11 @@ class SocialInformationViewset(ModelViewSet):
     API endpoint that allows social information
      to be viewed, created, deleted or edited.
     """
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                                      IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly,)
     authentication_class = (TokenAuthentication,)
     serializer_class = SocialInformationSerializer
     class_name = SocialInformation
     queryset = SocialInformation.objects.all()
-
-    def get(self, request, format=None):
-        content = {
-            'user': unicode(request.user),  # `django.contrib.auth.User` instance.
-            'auth': unicode(request.auth),  # None
-        }
-        return Response(content)
 
     def list(self, request):
         """
@@ -195,19 +188,11 @@ class UserViewset(ModelViewSet):
     API endpoint that allows user
      to be viewed, created, deleted or edited.
     """
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                                      IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
     authentication_class = (TokenAuthentication,)
     serializer_class = UserSerializer
     class_name = User
     queryset = User.objects.all()
-
-    def get(self, request, format=None):
-        content = {
-            'user': unicode(request.user),  # `django.contrib.auth.User` instance.
-            'auth': unicode(request.auth),  # None
-        }
-        return Response(content)
 
     def list(self, request):
         """
