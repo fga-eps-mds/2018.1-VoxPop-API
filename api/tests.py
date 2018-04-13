@@ -140,14 +140,14 @@ class SocialInformationTests(APITestCase):
         )
         self.social = SocialInformation.objects.create(
             owner=self.user,
-            state='AC',
+            federal_unit='AC',
             city='Rio Branco',
             income='10.00',
             education='EFC',
             job='Dono de Casa',
             birth_date='2018-04-07'
         )
-        self.url = '/api/socialInformation/'
+        self.url = '/api/social_informations/'
 
     def tearDown(self):
         """
@@ -170,7 +170,7 @@ class SocialInformationTests(APITestCase):
         """
         data = {
             "owner": self.user,
-            "state": "AC",
+            "federal_unit": "AC",
             "city": "Rio Branco",
             "income": "10.00",
             "education": "EFC",
@@ -187,7 +187,7 @@ class SocialInformationTests(APITestCase):
         self.assertEqual(self.social.job, 'Dono de Casa')
         data = {
             "owner": self.user.pk,
-            "state": "AC",
+            "federal_unit": "AC",
             "city": "Rio Branco",
             "income": "10.00",
             "education": "EFC",
@@ -208,7 +208,7 @@ class SocialInformationTests(APITestCase):
         self.assertEqual(self.social.birth_date, '2018-04-07')
         data = {
             "owner": self.user.pk,
-            "state": "AC",
+            "federal_unit": "AC",
             "city": "Rio Branco",
             "income": "10.00",
             "education": "EFC",
