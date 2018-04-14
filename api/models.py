@@ -1,6 +1,8 @@
-from django.db import models
-from django.contrib.auth.models import User
 import datetime
+
+from django.contrib.auth.models import User
+from django.db import models
+
 
 # Create your models here.
 UF_CHOICES = (
@@ -47,6 +49,19 @@ EDUCATION_CHOICES = (
     ('PD', 'Pós-Doutorado')
 )
 
+VOTE_CHOICES = (
+    ('SIM', 'Sim'),
+    ('NAO', 'Não'),
+    ('ABSTENCAO', 'Abstenção'),
+    ('OBSTRUCAO', 'Obstrução'),
+    ('AUSENTE', 'Ausente'),
+)
+
+GENDER_CHOICES = (
+    ('M', 'Male'),
+    ('F', 'Female'),
+)
+
 
 class SocialInformation(models.Model):
 
@@ -63,3 +78,17 @@ class SocialInformation(models.Model):
     )
     job = models.CharField(max_length=100, blank=True)
     birth_date = models.DateField(default=datetime.date.today)
+
+
+class Parliamentary(models.Model):
+
+    # parliamentary_id  is getted from camara's API parliamentary ID
+    parliamentary_id = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
+    gender = \
+        models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True)
+    federal_unit = models.CharField(max_length=100, blank=True)
+    photo = models.URLField(blank=True)
+
+    def __str__(self):
+        return '{name}'.format(name=self.name)
