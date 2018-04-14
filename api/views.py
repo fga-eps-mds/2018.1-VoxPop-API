@@ -7,10 +7,9 @@ from .serializers import (
 from rest_framework.viewsets import ModelViewSet
 from django.contrib.auth.models import User
 from rest_framework import permissions
-from rest_framework.permissions import IsAuthenticated
+from .permissions import UserPermissions
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
-from .permissions import IsOwnerOrReadOnly
 
 
 class SocialInformationViewset(ModelViewSet):
@@ -18,8 +17,7 @@ class SocialInformationViewset(ModelViewSet):
     API endpoint that allows social information
      to be viewed, created, deleted or edited.
     """
-    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly,)
-    authentication_class = (TokenAuthentication,)
+    # permission_classes = (UserPermissions,)
     serializer_class = SocialInformationSerializer
     class_name = SocialInformation
     queryset = SocialInformation.objects.all()
@@ -188,8 +186,7 @@ class UserViewset(ModelViewSet):
     API endpoint that allows user
      to be viewed, created, deleted or edited.
     """
-    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
-    authentication_class = (TokenAuthentication,)
+    permission_classes = (UserPermissions,)
     serializer_class = UserSerializer
     class_name = User
     queryset = User.objects.all()
