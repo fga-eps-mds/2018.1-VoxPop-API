@@ -40,11 +40,11 @@ class UserSerializer(serializers.ModelSerializer):
             },
         }
 
-        def create(self, validated_data):
-            voxpopuser = User(**validated_data)
-            password = validated_data['password']
-            voxpopuser.set_password(password)
-            voxpopuser.save()
-            token = Token.objects.create(user=voxpopuser)
-            token.save()
-            return voxpopuser
+    def create(self, validated_data):
+        voxpopuser = User(**validated_data)
+        password = validated_data['password']
+        voxpopuser.set_password(password)
+        voxpopuser.save()
+        token = Token.objects.create(user=voxpopuser)
+        token.save()
+        return voxpopuser
