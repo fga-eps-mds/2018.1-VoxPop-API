@@ -1,18 +1,19 @@
+from api.views import LoaderViewSet, SocialInformationViewset, UserViewset
+
 from django.conf.urls import include, url
 from django.contrib import admin
 
 from rest_framework import routers
+from rest_framework.authtoken import views
 
 from rest_framework_swagger.views import get_swagger_view
-
-from api.views import UserViewset, SocialInformationViewset
-from rest_framework.authtoken import views
 
 schema_view = get_swagger_view(title='VoxPop API')
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewset)
 router.register(r'social_informations', SocialInformationViewset)
+router.register(r'loader', LoaderViewSet, 'loader')
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

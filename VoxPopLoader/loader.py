@@ -54,11 +54,17 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
     def setup(self):
 
         _itens_per_page = 100
-        _sort_by = "nome"
+        _sort_by_name = "nome"
+        _sort_by_year = "ano"
 
         self.itens_per_page_filter = \
             "itens={quantity}".format(quantity=_itens_per_page)
-        self.sort_by_filter = "ordenarPor={option}".format(option=_sort_by)
+        self.sort_by_name_filter = "ordenarPor={option}".format(
+            option=_sort_by_name
+        )
+        self.sort_by_year_filter = "ordenarPor={option}".format(
+            option=_sort_by_year
+        )
         self.page_filter = "pagina="
 
         self.base_url = "https://dadosabertos.camara.leg.br/api/v2/"
@@ -66,10 +72,19 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
             "{base}deputados?{itens_per_page}&{sort_by}&{page}".format(
                 base=self.base_url,
                 itens_per_page=self.itens_per_page_filter,
-                sort_by=self.sort_by_filter,
+                sort_by=self.sort_by_name_filter,
                 page=self.page_filter
             )
         self._specific_parliamentary_url = "{base}deputados/".format(
+            base=self.base_url
+        )
+        self.propositions_ids_url = \
+            "{base}proposicoes?{itens_per_page}&{page}".format(
+                base=self.base_url,
+                itens_per_page=self.itens_per_page_filter,
+                page=self.page_filter
+            )
+        self._specific_proposition_url = "{base}proposicoes/".format(
             base=self.base_url
         )
 
@@ -83,6 +98,14 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
             )
         self.create_parliamentary_url = \
             "{loader}create_parliamentary/".format(
+                loader=self.loader_url
+            )
+        self.get_propositions_url = \
+            "{loader}get_propositions/".format(
+                loader=self.loader_url
+            )
+        self.create_proposition_url = \
+            "{loader}create_proposition/".format(
                 loader=self.loader_url
             )
 
@@ -265,6 +288,107 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
         duration = time.time() - start_time
         logger.info("Get parliamentarians took %.2f seconds." % duration)
 
+    def __get_propositions(self):
+
+        start_time = time.time()
+        logger.info("Started getting propositions data...")
+
+        _propositions_result = None
+        _propositions_ids_list = []
+        _page = 1
+
+        while _propositions_result != []:
+
+            request_url = \
+                VoxPopLoaderTCPHandler.__get_concatenated_url(
+                    self.propositions_ids_url,
+                    _page
+                )
+
+            result = requests.get(
+                request_url,
+                headers={"content-type": "application/json"}
+            )
+            _propositions_result = json.loads(result.content)['dados']
+
+            for proposition in _propositions_result:
+                _propositions_ids_list.append(proposition['id'])
+
+            _page += 1
+
+        logger.info("Propositions IDs collected successful!")
+
+        existing_propositions = requests.get(
+            self.get_propositions_url,
+            params={"key": VoxPopLoaderTCPHandler.__get_credentials()}
+        ).content
+        existing_propositions_list = json.loads(existing_propositions)
+
+        logger.info("Existing propositions IDs collected successful!")
+
+        for proposition_id in _propositions_ids_list:
+
+            if str(proposition_id) not in existing_propositions_list:
+
+                request_url = \
+                    self.__get_concatenated_url(
+                        self._specific_proposition_url,
+                        proposition_id
+                    )
+
+                result = requests.get(
+                    request_url,
+                    headers={"content-type": "application/json"}
+                )
+
+                proposition_result = \
+                    json.loads(result.content)['dados']
+
+                sp = 'statusProposicao'
+
+                specific_proposition_dict = {
+                    'proposition_id': proposition_result['id'],
+                    # Tipo de proposição
+                    'proposition_type': proposition_result['descricaoTipo'],
+                    # Sigla do tipo de proposição
+                    'proposition_type_initials':
+                        proposition_result['siglaTipo'],
+                    # Número da proposição
+                    'number': proposition_result['numero'],
+                    # Ano de apresentação
+                    'year': proposition_result['ano'],
+                    # Ementa da proposição
+                    'abstract': proposition_result['ementa'],
+                    # Tramitação
+                    'processing':
+                        proposition_result[sp]['descricaoTramitacao'],
+                    # Situação
+                    'situation': proposition_result[sp]['descricaoSituacao'],
+                    # Despacho da proposição
+                    'dispatch': proposition_result[sp]['despacho'],
+                    # URL da proposição na íntegra
+                    'url_full': proposition_result[sp]['url']
+                }
+
+                requests.post(
+                    self.create_proposition_url,
+                    data=specific_proposition_dict,
+                    params={"key": VoxPopLoaderTCPHandler.__get_credentials()}
+                )
+                # Proposition.objects.create(**specific_proposition_dict)
+
+                logger.info("Proposition " + str(proposition_id) +
+                            " saved!")
+
+            else:
+                logger.warning("Proposition " + str(proposition_id) +
+                               " already exists!")
+
+        logger.info("Propositions data collected successful!")
+
+        duration = time.time() - start_time
+        logger.info("Get propositions took %.2f seconds." % duration)
+
     def handle(self):
         self.data = self.request.recv(4096).strip().decode()
 
@@ -278,26 +402,43 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
 
                     try:
                         logger.info(
-                            "{} has requested VoxPopLoader to get \
-                            parliamentarians data.".format(
+                            "{} has requested VoxPopLoader to get".format(
                                 self.client_address[0]
-                            )
+                            ) + "parliamentarians data."
                         )
                         self.__get_parliamentarians()
                         self.__send_ok_response("get_parliamentarians")
 
                     except Exception as e:
                         logger.error(
-                            "An error has occurred trying to get \
-                            parliamentarians data."
+                            "An error has occurred trying to get" +
+                            "parliamentarians data."
+                        )
+                        logger.error(str(e))
+
+                elif task == "get_propositions":
+
+                    try:
+                        logger.info(
+                            "{} has requested VoxPopLoader to get".format(
+                                self.client_address[0]
+                            ) + "propositions data."
+                        )
+                        self.__get_propositions()
+                        self.__send_ok_response("get_propositions")
+
+                    except Exception as e:
+                        logger.error(
+                            "An error has occurred trying to get" +
+                            "propositions data."
                         )
                         logger.error(str(e))
 
                 else:
                     logger.warning(
-                        "{} has requested VoxPopLoader with wrong \
-                        task: {}".format(
-                            self.client_address[0],
+                       "{} has requested VoxPopLoader with wrong".format(
+                            self.client_address[0]
+                       ) + "task: {}".format(
                             task
                         )
                     )

@@ -8,7 +8,7 @@ from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from .models import Parliamentary, SocialInformation
+from .models import Parliamentary, Proposition, SocialInformation
 from .permissions import SocialInformationPermissions, UserPermissions
 from .serializers import SocialInformationSerializer, UserSerializer
 
@@ -434,6 +434,41 @@ class LoaderViewSet(ViewSet):
                 LoaderViewSet.__get_credentials():
             parliamentary_dict = request.data.dict()
             Parliamentary.objects.create(**parliamentary_dict)
+
+            response = Response({"status": "OK"}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response(
+                {'status': 'Unauthorized'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        return response
+
+    @list_route(methods=['get'])
+    def get_propositions(self, request):
+        if request.query_params.get('key') == \
+                LoaderViewSet.__get_credentials():
+            proposition_ids = []
+            for proposition in Proposition.objects.all():
+                proposition_ids.append(proposition.proposition_id)
+
+            response = Response(proposition_ids, status=status.HTTP_200_OK)
+
+        else:
+            response = Response(
+                {'status': 'Unauthorized'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        return response
+
+    @list_route(methods=['post'])
+    def create_proposition(self, request):
+        if request.query_params.get('key') == \
+                LoaderViewSet.__get_credentials():
+            proposition_dict = request.data.dict()
+            Proposition.objects.create(**proposition_dict)
 
             response = Response({"status": "OK"}, status=status.HTTP_200_OK)
 
