@@ -1,4 +1,7 @@
-from api.views import LoaderViewSet, SocialInformationViewset, UserViewset
+from api.views import (
+    LoaderViewSet, ParliamentaryViewset, PropositionViewset,
+    SocialInformationViewset, UserViewset
+)
 
 from django.conf.urls import include, url
 from django.contrib import admin
@@ -14,6 +17,8 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewset)
 router.register(r'social_informations', SocialInformationViewset)
 router.register(r'loader', LoaderViewSet, 'loader')
+router.register(r'parliamentarians', ParliamentaryViewset, 'parliamentarians')
+router.register(r'propositions', PropositionViewset, 'propositions')
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

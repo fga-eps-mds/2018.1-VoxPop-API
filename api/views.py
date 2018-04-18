@@ -10,7 +10,10 @@ from rest_framework.viewsets import ViewSet
 
 from .models import Parliamentary, Proposition, SocialInformation
 from .permissions import SocialInformationPermissions, UserPermissions
-from .serializers import SocialInformationSerializer, UserSerializer
+from .serializers import (
+    ParliamentarySerializer, PropositionSerializer,
+    SocialInformationSerializer, UserSerializer
+)
 
 
 class SocialInformationViewset(mixins.RetrieveModelMixin,
@@ -479,3 +482,17 @@ class LoaderViewSet(ViewSet):
             )
 
         return response
+
+
+class ParliamentaryViewset(mixins.RetrieveModelMixin,
+                           mixins.ListModelMixin,
+                           viewsets.GenericViewSet):
+    serializer_class = ParliamentarySerializer
+    queryset = Parliamentary.objects.all()
+
+
+class PropositionViewset(mixins.RetrieveModelMixin,
+                         mixins.ListModelMixin,
+                         viewsets.GenericViewSet):
+    serializer_class = PropositionSerializer
+    queryset = Proposition.objects.all()
