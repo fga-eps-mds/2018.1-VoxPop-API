@@ -7,5 +7,6 @@ services:
     volumes:
       - ../../.:/code
       - /static:/static
+      - /logging:/code/logging
     ports:
       - "8000:8000"

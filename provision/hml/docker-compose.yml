@@ -12,6 +12,7 @@ services:
     volumes:
       - ../../.:/code
       - /static:/static
+      - /logging:/code/logging
     expose:
       - "8000"
     depends_on:
@@ -26,3 +27,11 @@ services:
       - /static:/static
     depends_on:
       - api
+  loader:
+    build: ../../VoxPopLoader
+    command: bash -c "python3 loader.py runservice 0.0.0.0:3500"
+    volumes:
+      - ../../VoxPopLoader:/code
+      - /logging:/code/logging
+    ports:
+      - "3500:3500"
