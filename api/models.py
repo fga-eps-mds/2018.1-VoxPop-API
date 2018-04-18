@@ -4,6 +4,7 @@ import datetime
 
 # Create your models here.
 UF_CHOICES = (
+    ('N', 'Null'),
     ('AC', 'Acre'),
     ('AL', 'Alagoas'),
     ('AP', 'Amapá'),
@@ -33,6 +34,7 @@ UF_CHOICES = (
 )
 
 EDUCATION_CHOICES = (
+    ('N', 'Null'),
     ('EFC', 'Ensino Fundamental Completo'),
     ('EFI', 'Ensino Fundamental Incompleto'),
     ('EMC', 'Ensino Médio Completo'),
@@ -53,11 +55,11 @@ class SocialInformation(models.Model):
         related_name='social_information',
         on_delete=models.CASCADE
     )
-    federal_unit = models.CharField(max_length=150, choices=UF_CHOICES, default='AC')
+    federal_unit = models.CharField(max_length=150, choices=UF_CHOICES, default='N')
     city = models.CharField(max_length=150, blank=True)
     income = models.DecimalField(default=0, decimal_places=2, max_digits=9)
     education = models.CharField(
-        max_length=150, choices=EDUCATION_CHOICES, default='EFC'
+        max_length=150, choices=EDUCATION_CHOICES, default='N'
     )
     job = models.CharField(max_length=100, blank=True)
     birth_date = models.DateField(default=datetime.date.today)
