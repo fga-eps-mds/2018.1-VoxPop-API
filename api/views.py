@@ -1,12 +1,13 @@
 # # from django.shortcuts import render
-from .models import SocialInformation
-from .serializers import (
-                            UserSerializer,
-                            SocialInformationSerializer,
-                        )
-from rest_framework.viewsets import ModelViewSet
 from django.contrib.auth.models import User
-from .permissions import UserPermissions, SocialInformationPermissions
+
+from rest_framework.viewsets import ModelViewSet
+
+from .models import SocialInformation
+from .permissions import SocialInformationPermissions, UserPermissions
+from .serializers import (
+    SocialInformationSerializer, UserSerializer
+)
 
 
 class SocialInformationViewset(ModelViewSet):

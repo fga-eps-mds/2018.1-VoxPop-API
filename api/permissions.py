@@ -1,5 +1,7 @@
 from rest_framework import permissions
+
 from .models import SocialInformation
+
 
 class UserPermissions(permissions.BasePermission):
 
@@ -30,7 +32,6 @@ class UserPermissions(permissions.BasePermission):
         return permission
 
 
-
 class SocialInformationPermissions(permissions.BasePermission):
 
     def has_permission(self, request, view):
@@ -43,20 +44,20 @@ class SocialInformationPermissions(permissions.BasePermission):
         elif request.user.is_anonymous:
             return False
 
-        elif (request.method == 'POST' and \
-                SocialInformation.objects.filter(owner=request.user).count() \
+        elif (request.method == 'POST' and
+                SocialInformation.objects.filter(owner=request.user).count()
                 == 0):
             return True
 
-        elif 'socialInformation' in request.path:
+        elif 'social_informations' in request.path:
 
             social_information = \
-                SocialInformation.objects.filter(owner=request.user)
+                SocialInformation.objects.filter(owner=request.user.id)
             if(social_information):
                 social_information = social_information.first().id
-            url_id = request.path.split('/socialInformation/')[1][:-1]
+            url_id = request.path.split('/social_informations/')[1][:-1]
 
-            if(url_id == social_information):
+            if(url_id == str(social_information)):
                 authorized_user = True
 
             if(request.method != 'DELETE' and authorized_user):
