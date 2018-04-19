@@ -22,7 +22,8 @@ pipeline {
         stage('Test') {
             steps {
                 sh "flake8 --exclude='manage.py, voxpopapi/settings.py, migrations, templates, */models.py, */tests.py, */admin.py, provision, nginx, docs, setup.py' ."
-                sh '/var/lib/jenkins/workspace/.virtualenvs/api/bin/python3 manage.py test'
+                sh "/var/lib/jenkins/workspace/.virtualenvs/api/bin/coverage run --source='.' --omit=voxpopapi/celery.py,voxpopapi/wsgi.py,api/migrations/*,api/tasks.py,api/apps.py manage.py test api"
+                sh '/var/lib/jenkins/workspace/.virtualenvs/api/bin/coverage report'
             }
         }
         stage('Homologation deploy') {

@@ -7,3 +7,4 @@ pylint
 django-cors-headers
 django-celery-beat
 redis
+coverage

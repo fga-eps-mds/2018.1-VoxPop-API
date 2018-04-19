@@ -20,6 +20,8 @@
 </p>
 
 <p align="center">
+  <a href="https://codeclimate.com/github/fga-gpp-mds/2018.1-VoxPop-API/maintainability"><img src="https://api.codeclimate.com/v1/badges/d5d1a9d76ae1c84fc006/maintainability" /></a>
+  <a href="https://codeclimate.com/github/fga-gpp-mds/2018.1-VoxPop-API/test_coverage"><img src="https://api.codeclimate.com/v1/badges/d5d1a9d76ae1c84fc006/test_coverage" /></a>
   <a href="https://opensource.org/licenses/GPL-3.0"><img src="https://img.shields.io/badge/License-GPL-blue.svg" alt="License: GPL-3.0"></a>
   <a href="http://www.django-rest-framework.org/"><img src="https://img.shields.io/badge/Django--REST-3.7.7-red.svg" alt="Django-REST 3.7.7"></a>
   <a href="https://www.postgresql.org/?&"><img src="https://img.shields.io/badge/PostgreSQL-10.3-blue.svg" alt="PostgreSQL 10.3"></a>
