@@ -365,8 +365,6 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
                         proposition_result[sp]['descricaoTramitacao'],
                     # Situação
                     'situation': proposition_result[sp]['descricaoSituacao'],
-                    # Despacho da proposição
-                    'dispatch': proposition_result[sp]['despacho'],
                     # URL da proposição na íntegra
                     'url_full': proposition_result[sp]['url']
                 }

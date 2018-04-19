@@ -76,6 +76,5 @@ class PropositionSerializer(serializers.ModelSerializer):
             'abstract',
             'processing',
             'situation',
-            'dispatch',
             'url_full'
         ]

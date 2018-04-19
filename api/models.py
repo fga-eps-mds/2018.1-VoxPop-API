@@ -101,10 +101,9 @@ class Proposition(models.Model):
     proposition_type_initials = models.CharField(max_length=20, blank=True)
     number = models.IntegerField(blank=True)
     year = models.IntegerField(blank=True)
-    abstract = models.CharField(max_length=100, blank=True)
+    abstract = models.TextField(max_length=2000, blank=True)
     processing = models.CharField(max_length=100, blank=True)
     situation = models.CharField(max_length=100, blank=True)
-    dispatch = models.CharField(max_length=100, blank=True)
     url_full = models.URLField(blank=True)
 
     def __str__(self):
