@@ -169,7 +169,8 @@ class SocialInformationTests(APITestCase):
 
     def test_invalid_create_social(self):
         """
-        Ensure we can't create a invalid social information object.
+        Ensure we can't create a social information object because
+        SocialInformationViewset doesn't have a create method.
         """
         data = {
             "owner": self.user,
@@ -178,10 +179,16 @@ class SocialInformationTests(APITestCase):
             "income": "10.00",
             "education": "EFC",
             "job": "Dono de Casa",
-            "birth_date": "20180-32-13"
+            "birth_date": "2018-01-01"
         }
-        response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = None
+
+        try:
+            response = self.client.post(self.url, data)
+        except AttributeError:
+            pass
+
+        self.assertIsNone(response)
 
     def test_update_social(self):
         """

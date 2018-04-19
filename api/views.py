@@ -2,7 +2,6 @@
 from django.contrib.auth.models import User
 
 from rest_framework import mixins, viewsets
-from rest_framework.viewsets import ModelViewSet
 
 from .models import SocialInformation
 from .permissions import SocialInformationPermissions, UserPermissions
