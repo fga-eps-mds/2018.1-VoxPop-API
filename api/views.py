@@ -1,11 +1,17 @@
-# # from django.shortcuts import render
+import json
+from base64 import b64encode
+
 from django.contrib.auth.models import User
 
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import list_route
+from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
 
-from .models import SocialInformation
+from .models import Parliamentary, Proposition, SocialInformation
 from .permissions import SocialInformationPermissions, UserPermissions
 from .serializers import (
+    ParliamentarySerializer, PropositionSerializer,
     SocialInformationSerializer, UserSerializer
 )
 
@@ -385,3 +391,108 @@ class UserViewset(mixins.CreateModelMixin,
             pk,
             **kwargs)
         return response
+
+
+class LoaderViewSet(ViewSet):
+    """
+    A viewset that provides VoxPopLoader actions
+    """
+
+    @classmethod
+    def __get_credentials(cls):
+        with open('.loader_credentials.json', 'r') as f:
+            read_data = f.read()
+
+        read_data = json.loads(read_data)
+        username = read_data['username']
+        password = read_data['password']
+
+        utf_8_authorization = "{username}:{password}".format(
+            username=username, password=password
+        ).encode()
+
+        return "Basic " + b64encode(utf_8_authorization).decode("ascii")
+
+    @list_route(methods=['get'])
+    def get_parliamentarians(self, request):
+        if request.query_params.get('key') == \
+                LoaderViewSet.__get_credentials():
+            parliamentary_ids = []
+            for parliamentary in Parliamentary.objects.all():
+                parliamentary_ids.append(parliamentary.parliamentary_id)
+
+            response = Response(parliamentary_ids, status=status.HTTP_200_OK)
+
+        else:
+            response = Response(
+                {'status': 'Unauthorized'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        return response
+
+    @list_route(methods=['post'])
+    def create_parliamentary(self, request):
+        if request.query_params.get('key') == \
+                LoaderViewSet.__get_credentials():
+            parliamentary_dict = request.data.dict()
+            Parliamentary.objects.create(**parliamentary_dict)
+
+            response = Response({"status": "OK"}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response(
+                {'status': 'Unauthorized'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        return response
+
+    @list_route(methods=['get'])
+    def get_propositions(self, request):
+        if request.query_params.get('key') == \
+                LoaderViewSet.__get_credentials():
+            proposition_ids = []
+            for proposition in Proposition.objects.all():
+                proposition_ids.append(proposition.proposition_id)
+
+            response = Response(proposition_ids, status=status.HTTP_200_OK)
+
+        else:
+            response = Response(
+                {'status': 'Unauthorized'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        return response
+
+    @list_route(methods=['post'])
+    def create_proposition(self, request):
+        if request.query_params.get('key') == \
+                LoaderViewSet.__get_credentials():
+            proposition_dict = request.data.dict()
+            Proposition.objects.create(**proposition_dict)
+
+            response = Response({"status": "OK"}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response(
+                {'status': 'Unauthorized'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        return response
+
+
+class ParliamentaryViewset(mixins.RetrieveModelMixin,
+                           mixins.ListModelMixin,
+                           viewsets.GenericViewSet):
+    serializer_class = ParliamentarySerializer
+    queryset = Parliamentary.objects.all()
+
+
+class PropositionViewset(mixins.RetrieveModelMixin,
+                         mixins.ListModelMixin,
+                         viewsets.GenericViewSet):
+    serializer_class = PropositionSerializer
+    queryset = Proposition.objects.all()

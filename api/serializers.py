@@ -1,4 +1,4 @@
-from .models import SocialInformation
+from .models import Parliamentary, Proposition, SocialInformation
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -50,3 +50,32 @@ class UserSerializer(serializers.ModelSerializer):
         social_information = SocialInformation.objects.create(owner=voxpopuser)
         social_information.save()
         return voxpopuser
+
+
+class ParliamentarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parliamentary
+        fields = [
+            'parliamentary_id',
+            'name',
+            'gender',
+            'federal_unit',
+            'photo'
+        ]
+
+
+class PropositionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Proposition
+        fields = [
+            'proposition_id',
+            'proposition_type',
+            'proposition_type_initials',
+            'number',
+            'year',
+            'abstract',
+            'processing',
+            'situation',
+            'dispatch',
+            'url_full'
+        ]

@@ -3,6 +3,7 @@
   vars_files:
     - vars.yml
     - "{{ install_root }}/.credentials/db.yml"
+    - "{{ install_root }}/.credentials/loader.yml"
   gather_facts: false
   become: yes
 
@@ -35,6 +36,16 @@
       template:
         src: initdb.sh.j2
         dest: "{{ install_root }}/{{ project_name }}/provision/scripts/db/initdb.sh"
+
+    - name: Apply loader credentials file to API
+      template:
+        src: .loader_credentials.json.j2
+        dest: "{{ install_root }}/{{ project_name }}/.loader_credentials.json"
+
+    - name: Apply loader credentials file to VoxPopLoader
+      template:
+        src: .loader_credentials.json.j2
+        dest: "{{ install_root }}/{{ project_name }}/VoxPopLoader/.loader_credentials.json"
 
     - name: Rebuild application image
       command: "docker-compose -f provision/{{ env }}/docker-compose.yml build"

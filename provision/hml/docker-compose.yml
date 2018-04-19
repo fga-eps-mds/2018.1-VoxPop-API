@@ -6,16 +6,22 @@ services:
     volumes:
         - ../../../data:/var/lib/postgresql/data:rw
         - ../scripts/db:/docker-entrypoint-initdb.d:rw
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
   api:
     build: ../../.
     command: bash -c "chmod +x provision/scripts/run.sh && ./provision/scripts/run.sh"
     volumes:
       - ../../.:/code
       - /static:/static
+      - /logging:/code/logging
     expose:
       - "8000"
     depends_on:
       - db
+      - redis
   nginx:
     image: nginx
     ports:
@@ -26,3 +32,11 @@ services:
       - /static:/static
     depends_on:
       - api
+  loader:
+    build: ../../VoxPopLoader
+    command: bash -c "python3 loader.py runservice 0.0.0.0:3500"
+    volumes:
+      - ../../VoxPopLoader:/code
+      - /logging:/code/logging
+    ports:
+      - "3500:3500"
