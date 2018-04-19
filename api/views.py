@@ -1,6 +1,7 @@
 # # from django.shortcuts import render
 from django.contrib.auth.models import User
 
+from rest_framework import mixins, viewsets
 from rest_framework.viewsets import ModelViewSet
 
 from .models import SocialInformation
@@ -10,7 +11,10 @@ from .serializers import (
 )
 
 
-class SocialInformationViewset(ModelViewSet):
+class SocialInformationViewset(mixins.RetrieveModelMixin,
+                               mixins.ListModelMixin,
+                               mixins.UpdateModelMixin,
+                               viewsets.GenericViewSet):
     """Description: SocialInformationViewset.
     API endpoint that allows social information
      to be viewed, created, deleted or edited.
@@ -179,7 +183,11 @@ class SocialInformationViewset(ModelViewSet):
         return response
 
 
-class UserViewset(ModelViewSet):
+class UserViewset(mixins.CreateModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.ListModelMixin,
+                  mixins.UpdateModelMixin,
+                  viewsets.GenericViewSet):
     """Description: UserViewset.
     API endpoint that allows user
      to be viewed, created, deleted or edited.
