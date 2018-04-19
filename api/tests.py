@@ -1,7 +1,8 @@
+import datetime
 from django.test import Client
+from django.contrib.auth.models import User
 from .models import SocialInformation
 from django.urls import include, path, reverse
-from django.contrib.auth.models import User
 from rest_framework.test import APIRequestFactory, APITestCase
 from .views import SocialInformationViewset, UserViewset
 from  rest_framework import serializers, status
@@ -15,7 +16,11 @@ class UserTests(APITestCase):
         """
         This method will run before any test.
         """
-
+        self.superuser = User.objects.create_superuser(
+            username='flyer user',
+            email='flye@user.com',
+            password='idontneedthisshit'
+        )
         self.user = User.objects.create(
             username='teste',
             first_name='teste',
@@ -24,6 +29,8 @@ class UserTests(APITestCase):
             password='teste'
         )
         self.url = '/api/users/'
+        # self.client.force_login(self.user)
+        self.client.force_authenticate(self.superuser)
 
     def tearDown(self):
         """
@@ -36,7 +43,7 @@ class UserTests(APITestCase):
         Ensure we can create a user object.
         """
         response = self.client.get(self.url + str(self.user.pk) + '/')
-        new_user = User.objects.get(pk=self.user.pk)
+        # new_user = User.objects.get(pk=self.user.pk)
         self.assertEqual(response.status_code,  status.HTTP_200_OK)
 
     def test_invalid_create_user(self):
@@ -66,7 +73,6 @@ class UserTests(APITestCase):
             'password':'teste'
         }
         response = self.client.put(self.url + str(self.user.pk) + '/', data)
-
 
         new_user = User.objects.get(pk=self.user.pk)
         self.assertEqual(response.status_code,  status.HTTP_200_OK)
@@ -130,7 +136,11 @@ class SocialInformationTests(APITestCase):
         """
         This method will run before any test.
         """
-
+        self.superuser = User.objects.create_superuser(
+            username='flyer user',
+            email='flye@user.com',
+            password='idontneedthisshit'
+        )
         self.user = User.objects.create(
             username='teste',
             first_name='teste',
@@ -138,23 +148,16 @@ class SocialInformationTests(APITestCase):
             email='teste@teste.com',
             password='teste'
         )
-        self.social = SocialInformation.objects.create(
-            owner=self.user,
-            federal_unit='AC',
-            city='Rio Branco',
-            income='10.00',
-            education='EFC',
-            job='Dono de Casa',
-            birth_date='2018-04-07'
-        )
+        self.social = SocialInformation.objects.create(owner=self.user)
         self.url = '/api/social_informations/'
+        self.client.force_authenticate(self.superuser)
 
     def tearDown(self):
         """
         This method will run after any test.
         """
         self.user.delete()
-        self.social.delete()
+        # self.social.delete()
 
     def test_create_social(self):
         """
@@ -166,7 +169,8 @@ class SocialInformationTests(APITestCase):
 
     def test_invalid_create_social(self):
         """
-        Ensure we can't create a invalid social information object.
+        Ensure we can't create a social information object because
+        SocialInformationViewset doesn't have a create method.
         """
         data = {
             "owner": self.user,
@@ -175,16 +179,22 @@ class SocialInformationTests(APITestCase):
             "income": "10.00",
             "education": "EFC",
             "job": "Dono de Casa",
-            "birth_date": "20180-32-13"
+            "birth_date": "2018-01-01"
         }
-        response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = None
+
+        try:
+            response = self.client.post(self.url, data)
+        except AttributeError:
+            pass
+
+        self.assertIsNone(response)
 
     def test_update_social(self):
         """
         Ensure we can update a new social information object.
         """
-        self.assertEqual(self.social.job, 'Dono de Casa')
+        self.assertEqual(self.social.job, '')
         data = {
             "owner": self.user.pk,
             "federal_unit": "AC",
@@ -196,7 +206,6 @@ class SocialInformationTests(APITestCase):
         }
         response = self.client.put(self.url + str(self.social.pk) + '/', data)
 
-
         new_social = SocialInformation.objects.get(pk=self.social.pk)
         self.assertEqual(response.status_code,  status.HTTP_200_OK)
         self.assertEqual(new_social.job, 'Dono de Prédio')
@@ -205,7 +214,7 @@ class SocialInformationTests(APITestCase):
         """
         Ensure we can't update a social object with invalid fields.
         """
-        self.assertEqual(self.social.birth_date, '2018-04-07')
+        self.assertEqual(self.social.birth_date, datetime.date.today())
         data = {
             "owner": self.user.pk,
             "federal_unit": "AC",
@@ -216,7 +225,6 @@ class SocialInformationTests(APITestCase):
             "birth_date": "20180-43-213"
         }
         response = self.client.put(self.url + str(self.social.pk) + '/', data)
-
 
         new_social = SocialInformation.objects.get(pk=self.social.pk)
         self.assertEqual(response.status_code,  status.HTTP_400_BAD_REQUEST)
@@ -231,7 +239,7 @@ class SocialInformationTests(APITestCase):
         """
         Ensure we can partially update a social object.
         """
-        self.assertEqual(self.social.job, 'Dono de Casa')
+        self.assertEqual(self.social.job, '')
         data = {
             'job':'Dono de Condomínio',
         }
@@ -245,7 +253,7 @@ class SocialInformationTests(APITestCase):
         Ensure we can't partially update invalid information on a valid social
         object.
         """
-        self.assertEqual(self.social.job, 'Dono de Casa')
+        self.assertEqual(self.social.job, '')
         data = {
             'birth_date': '20180-56-89',
         }
