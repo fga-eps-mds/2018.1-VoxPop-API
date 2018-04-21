@@ -96,7 +96,7 @@ class Parliamentary(models.Model):
 
 class Proposition(models.Model):
 
-    proposition_id = models.CharField(max_length=100, unique=True)
+    native_id = models.CharField(max_length=100, unique=True)
     proposition_type = models.CharField(max_length=100, blank=True)
     proposition_type_initials = models.CharField(max_length=20, blank=True)
     number = models.IntegerField(blank=True)
@@ -107,8 +107,8 @@ class Proposition(models.Model):
     url_full = models.URLField(blank=True)
 
     def __str__(self):
-        return 'Proposition {proposition_id}'.format(
-            proposition_id=self.proposition_id
+        return 'Proposition {native_id}'.format(
+            native_id=self.native_id
         )
 
 

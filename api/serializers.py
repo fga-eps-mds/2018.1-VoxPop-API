@@ -68,7 +68,7 @@ class PropositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Proposition
         fields = [
-            'proposition_id',
+            'native_id',
             'proposition_type',
             'proposition_type_initials',
             'number',

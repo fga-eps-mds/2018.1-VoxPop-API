@@ -452,11 +452,11 @@ class LoaderViewSet(ViewSet):
     def get_propositions(self, request):
         if request.query_params.get('key') == \
                 LoaderViewSet.__get_credentials():
-            proposition_ids = []
+            native_ids = []
             for proposition in Proposition.objects.all():
-                proposition_ids.append(proposition.proposition_id)
+                native_ids.append(proposition.native_id)
 
-            response = Response(proposition_ids, status=status.HTTP_200_OK)
+            response = Response(native_ids, status=status.HTTP_200_OK)
 
         else:
             response = Response(
