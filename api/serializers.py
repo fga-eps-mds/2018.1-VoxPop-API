@@ -1,4 +1,4 @@
-from .models import Parliamentary, Proposition, SocialInformation
+from .models import Parliamentary, Proposition, SocialInformation, UserVote
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -68,7 +68,8 @@ class PropositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Proposition
         fields = [
-            'proposition_id',
+            'id',
+            'native_id',
             'proposition_type',
             'proposition_type_initials',
             'number',
@@ -77,4 +78,15 @@ class PropositionSerializer(serializers.ModelSerializer):
             'processing',
             'situation',
             'url_full'
+        ]
+
+
+class UserVoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserVote
+        fields = [
+            'id',
+            'user',
+            'proposition',
+            'option'
         ]

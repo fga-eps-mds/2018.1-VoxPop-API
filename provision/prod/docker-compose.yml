@@ -16,6 +16,8 @@ services:
     volumes:
       - ../../.:/code
       - /static:/static
+      - /logging:/code/logging
+      - /api/migrations:/code/api/migrations
     expose:
       - "8000"
     depends_on:

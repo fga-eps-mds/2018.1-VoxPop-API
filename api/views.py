@@ -8,11 +8,11 @@ from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from .models import Parliamentary, Proposition, SocialInformation
+from .models import Parliamentary, Proposition, SocialInformation, UserVote
 from .permissions import SocialInformationPermissions, UserPermissions
 from .serializers import (
     ParliamentarySerializer, PropositionSerializer,
-    SocialInformationSerializer, UserSerializer
+    SocialInformationSerializer, UserSerializer, UserVoteSerializer
 )
 
 
@@ -452,11 +452,11 @@ class LoaderViewSet(ViewSet):
     def get_propositions(self, request):
         if request.query_params.get('key') == \
                 LoaderViewSet.__get_credentials():
-            proposition_ids = []
+            native_ids = []
             for proposition in Proposition.objects.all():
-                proposition_ids.append(proposition.proposition_id)
+                native_ids.append(proposition.native_id)
 
-            response = Response(proposition_ids, status=status.HTTP_200_OK)
+            response = Response(native_ids, status=status.HTTP_200_OK)
 
         else:
             response = Response(
@@ -496,3 +496,46 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                          viewsets.GenericViewSet):
     serializer_class = PropositionSerializer
     queryset = Proposition.objects.all()
+
+    @list_route(methods=['get'])
+    def non_voted(self, request):
+        user = request.user
+        proposition_voted = []
+
+        try:
+            for vote in user.votes.all():
+                proposition_voted.append(vote.proposition)
+
+            all_propositions = Proposition.objects.all().order_by('-year')
+
+            response = Response(
+                {'status': 'No Content'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+
+            for proposition in all_propositions:
+                if proposition not in proposition_voted:
+                    proposition_serialized = PropositionSerializer(proposition)
+                    response = Response(
+                        proposition_serialized.data,
+                        status=status.HTTP_200_OK
+                    )
+                    break
+
+        except AttributeError:
+            return Response(
+                {'status': 'Unauthorized'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        return response
+
+
+class UserVoteViewset(viewsets.ModelViewSet):
+
+    serializer_class = UserVoteSerializer
+    queryset = UserVote.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+        return UserVote.objects.filter(user=user)
