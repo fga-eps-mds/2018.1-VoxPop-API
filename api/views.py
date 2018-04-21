@@ -496,3 +496,28 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                          viewsets.GenericViewSet):
     serializer_class = PropositionSerializer
     queryset = Proposition.objects.all()
+
+    @list_route(methods=['get'])
+    def non_voted(self, request):
+        user = request.user
+        proposition_voted = []
+
+        for vote in user.votes.all():
+            proposition_voted.append(vote.proposition)
+
+        all_propositions = Proposition.objects.all()
+
+        response = Response(
+            {'status': 'No Content'},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+        for proposition in all_propositions:
+            if proposition not in proposition_voted:
+                response = Response(
+                    proposition.__dict__,
+                    status=status.HTTP_200_OK
+                )
+                break
+
+        return response
