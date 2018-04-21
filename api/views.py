@@ -537,5 +537,10 @@ class UserVoteViewset(viewsets.ModelViewSet):
     queryset = UserVote.objects.all()
 
     def get_queryset(self):
-        user = self.request.user
-        return UserVote.objects.filter(user=user)
+        if not self.request.user.is_anonymous:
+            user = self.request.user
+            queryset = UserVote.objects.filter(user=user)
+        else:
+            queryset = UserVote.objects.none()
+
+        return queryset

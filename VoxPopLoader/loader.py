@@ -348,7 +348,7 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
                 sp = 'statusProposicao'
 
                 specific_proposition_dict = {
-                    'proposition_id': proposition_result['id'],
+                    'native_id': proposition_result['id'],
                     # Tipo de proposição
                     'proposition_type': proposition_result['descricaoTipo'],
                     # Sigla do tipo de proposição
