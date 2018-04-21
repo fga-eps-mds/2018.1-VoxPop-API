@@ -535,3 +535,7 @@ class UserVoteViewset(viewsets.ModelViewSet):
 
     serializer_class = UserVoteSerializer
     queryset = UserVote.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+        return UserVote.objects.filter(user=user)
