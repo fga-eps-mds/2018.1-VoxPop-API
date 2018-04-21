@@ -1,6 +1,6 @@
 from api.views import (
     LoaderViewSet, ParliamentaryViewset, PropositionViewset,
-    SocialInformationViewset, UserViewset
+    SocialInformationViewset, UserViewset, UserVoteViewset
 )
 
 from django.conf.urls import include, url
@@ -19,6 +19,7 @@ router.register(r'social_informations', SocialInformationViewset)
 router.register(r'loader', LoaderViewSet, 'loader')
 router.register(r'parliamentarians', ParliamentaryViewset, 'parliamentarians')
 router.register(r'propositions', PropositionViewset, 'propositions')
+router.register(r'user_votes', UserVoteViewset, 'user_votes')
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
