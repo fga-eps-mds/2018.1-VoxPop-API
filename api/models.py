@@ -50,11 +50,11 @@ EDUCATION_CHOICES = (
 )
 
 VOTE_CHOICES = (
-    ('SIM', 'Sim'),
-    ('NAO', 'Não'),
-    ('ABSTENCAO', 'Abstenção'),
-    ('OBSTRUCAO', 'Obstrução'),
-    ('AUSENTE', 'Ausente'),
+    ('Y', 'Yes'),
+    ('N', 'No'),
+    ('A', 'Abstention'),
+    ('O', 'Obstruction'),
+    ('M', 'Missing'),
 )
 
 GENDER_CHOICES = (
@@ -110,3 +110,17 @@ class Proposition(models.Model):
         return 'Proposition {proposition_id}'.format(
             proposition_id=self.proposition_id
         )
+
+
+class Vote(models.Model):
+
+    option = models.CharField(
+        max_length=1,
+        choices=VOTE_CHOICES,
+        blank=True
+    )
+    proposition = models.ForeignKey(
+        Proposition,
+        on_delete=models.DO_NOTHING,
+        related_name='votes'
+    )
