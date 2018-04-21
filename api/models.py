@@ -124,3 +124,12 @@ class Vote(models.Model):
         on_delete=models.DO_NOTHING,
         related_name='votes'
     )
+
+
+class UserVote(Vote):
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name='votes'
+    )
