@@ -502,24 +502,31 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         user = request.user
         proposition_voted = []
 
-        for vote in user.votes.all():
-            proposition_voted.append(vote.proposition)
+        try:
+            for vote in user.votes.all():
+                proposition_voted.append(vote.proposition)
 
-        all_propositions = Proposition.objects.all().order_by('-year')
+            all_propositions = Proposition.objects.all().order_by('-year')
 
-        response = Response(
-            {'status': 'No Content'},
-            status=status.HTTP_204_NO_CONTENT
-        )
+            response = Response(
+                {'status': 'No Content'},
+                status=status.HTTP_204_NO_CONTENT
+            )
 
-        for proposition in all_propositions:
-            if proposition not in proposition_voted:
-                proposition_serialized = PropositionSerializer(proposition)
-                response = Response(
-                    proposition_serialized.data,
-                    status=status.HTTP_200_OK
-                )
-                break
+            for proposition in all_propositions:
+                if proposition not in proposition_voted:
+                    proposition_serialized = PropositionSerializer(proposition)
+                    response = Response(
+                        proposition_serialized.data,
+                        status=status.HTTP_200_OK
+                    )
+                    break
+
+        except AttributeError:
+            return Response(
+                {'status': 'Unauthorized'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
         return response
 
