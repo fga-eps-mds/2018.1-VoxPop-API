@@ -279,7 +279,28 @@ class UserViewset(mixins.CreateModelMixin,
           }
           ```
         """
-        return super(UserViewset, self).create(request)
+        response = super(UserViewset, self).create(request)
+
+        user = User.objects.get(username=request.data['username'])
+
+        try:
+            social_information_data = request.data['social_information']
+        except KeyError:
+            social_information_data = {}
+
+        social_information_data['owner'] = user
+
+        social_information = \
+            SocialInformation.objects.create(**social_information_data)
+        social_information.save()
+
+        social_information_serializer = \
+            SocialInformationSerializer(social_information)
+
+        response.data['social_information'] = \
+            social_information_serializer.data
+
+        return response
 
     def destroy(self, request, pk=None):
         """

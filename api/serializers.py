@@ -47,8 +47,6 @@ class UserSerializer(serializers.ModelSerializer):
         voxpopuser.save()
         token = Token.objects.create(user=voxpopuser)
         token.save()
-        social_information = SocialInformation.objects.create(owner=voxpopuser)
-        social_information.save()
         return voxpopuser
 
 
