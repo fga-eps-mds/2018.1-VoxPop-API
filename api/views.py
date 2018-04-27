@@ -567,6 +567,43 @@ class UserVoteViewset(viewsets.ModelViewSet):
 
         return queryset
 
+    def list(self, request):
+        return super(UserVoteViewset, self).list(request)
+
+    def create(self, request):
+        user_id = request.user.id
+        request.data['user'] = user_id
+
+        return super(UserVoteViewset, self).create(request)
+
+    def destroy(self, request, pk=None):
+        response = super(UserVoteViewset, self).destroy(request, pk)
+        return response
+
+    def retrieve(self, request, pk=None):
+        response = super(UserVoteViewset, self).retrieve(request, pk)
+        return response
+
+    def partial_update(self, request, pk=None, **kwargs):
+        user_id = request.user.id
+        request.data['user'] = user_id
+
+        response = super(UserVoteViewset, self).partial_update(
+            request,
+            pk,
+            **kwargs)
+        return response
+
+    def update(self, request, pk=None, **kwargs):
+        user_id = request.user.id
+        request.data['user'] = user_id
+
+        response = super(UserVoteViewset, self).update(
+            request,
+            pk,
+            **kwargs)
+        return response
+
 
 class CustomObtainToken(ObtainAuthToken):
 
