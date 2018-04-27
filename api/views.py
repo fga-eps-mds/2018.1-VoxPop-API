@@ -568,13 +568,26 @@ class UserVoteViewset(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request):
-        return super(UserVoteViewset, self).list(request)
+        response = super(UserVoteViewset, self).list(request)
+
+        for vote in response.data['results']:
+            proposition = Proposition.objects.get(pk=vote['proposition'])
+            proposition_serializer = PropositionSerializer(proposition)
+            vote['proposition'] = proposition_serializer.data
+
+        return response
 
     def create(self, request):
         user_id = request.user.id
         request.data['user'] = user_id
 
-        return super(UserVoteViewset, self).create(request)
+        response = super(UserVoteViewset, self).create(request)
+
+        proposition = Proposition.objects.get(pk=response.data['proposition'])
+        proposition_serializer = PropositionSerializer(proposition)
+        response.data['proposition'] = proposition_serializer.data
+
+        return response
 
     def destroy(self, request, pk=None):
         response = super(UserVoteViewset, self).destroy(request, pk)
@@ -582,6 +595,11 @@ class UserVoteViewset(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk=None):
         response = super(UserVoteViewset, self).retrieve(request, pk)
+
+        proposition = Proposition.objects.get(pk=response.data['proposition'])
+        proposition_serializer = PropositionSerializer(proposition)
+        response.data['proposition'] = proposition_serializer.data
+
         return response
 
     def partial_update(self, request, pk=None, **kwargs):
@@ -602,6 +620,11 @@ class UserVoteViewset(viewsets.ModelViewSet):
             request,
             pk,
             **kwargs)
+
+        proposition = Proposition.objects.get(pk=response.data['proposition'])
+        proposition_serializer = PropositionSerializer(proposition)
+        response.data['proposition'] = proposition_serializer.data
+
         return response
 
 
