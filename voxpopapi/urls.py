@@ -1,5 +1,5 @@
 from api.views import (
-    LoaderViewSet, ParliamentaryViewset, PropositionViewset,
+    CustomObtainToken, LoaderViewSet, ParliamentaryViewset, PropositionViewset,
     SocialInformationViewset, UserViewset, UserVoteViewset
 )
 
@@ -7,7 +7,6 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 from rest_framework import routers
-from rest_framework.authtoken import views
 
 from rest_framework_swagger.views import get_swagger_view
 
@@ -25,6 +24,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(router.urls)),
     url(r'^api/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api/token_auth/', views.obtain_auth_token),
+    url(r'^api/token_auth/', CustomObtainToken.as_view()),
     url(r'^$', schema_view),
 ]

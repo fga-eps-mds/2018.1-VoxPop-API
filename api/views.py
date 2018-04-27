@@ -4,6 +4,7 @@ from base64 import b64encode
 from django.contrib.auth.models import User
 
 from rest_framework import mixins, status, viewsets
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
@@ -278,7 +279,28 @@ class UserViewset(mixins.CreateModelMixin,
           }
           ```
         """
-        return super(UserViewset, self).create(request)
+        response = super(UserViewset, self).create(request)
+
+        user = User.objects.get(username=request.data['username'])
+
+        try:
+            social_information_data = request.data['social_information']
+        except KeyError:
+            social_information_data = {}
+
+        social_information_data['owner'] = user
+
+        social_information = \
+            SocialInformation.objects.create(**social_information_data)
+        social_information.save()
+
+        social_information_serializer = \
+            SocialInformationSerializer(social_information)
+
+        response.data['social_information'] = \
+            social_information_serializer.data
+
+        return response
 
     def destroy(self, request, pk=None):
         """
@@ -544,3 +566,18 @@ class UserVoteViewset(viewsets.ModelViewSet):
             queryset = UserVote.objects.none()
 
         return queryset
+
+
+class CustomObtainToken(ObtainAuthToken):
+
+    def post(self, request, *args, **kwargs):
+        response = \
+            super(CustomObtainToken, self).post(request, *args, **kwargs)
+
+        user = User.objects.get(username=request.data['username'])
+        response.data['id'] = user.id
+        response.data['username'] = user.username
+        response.data['first_name'] = user.first_name
+        response.data['last_name'] = user.last_name
+
+        return response
