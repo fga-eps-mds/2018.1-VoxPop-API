@@ -50,6 +50,13 @@ class UserSerializer(serializers.ModelSerializer):
         return voxpopuser
 
 
+    def update(self, instance, validated_data):
+        instance = User(**validated_data)
+        password = validated_data['password']
+        instance.set_password(password) 
+        return instance
+
+
 class ParliamentarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Parliamentary
