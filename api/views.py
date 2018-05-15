@@ -2,6 +2,7 @@ import json
 from base64 import b64encode
 
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -518,6 +519,24 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                          viewsets.GenericViewSet):
     serializer_class = PropositionSerializer
     queryset = Proposition.objects.all().order_by('-year')
+
+    def get_queryset(self):
+        query = self.request.GET.get('query')
+        try:
+            query_int = int(query)
+        except ValueError:
+            query_int = -1
+
+        if query:
+            queryset = Proposition.objects.filter(
+                Q(abstract__contains=query) |
+                Q(number__contains=query) |
+                Q(proposition_type__contains=query) |
+                Q(proposition_type_initials__contains=query) |
+                Q(year=query_int)
+            )
+
+        return queryset
 
     @list_route(methods=['get'])
     def non_voted(self, request):
