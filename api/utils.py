@@ -1,12 +1,18 @@
 from django.db.models import Q
 
 
-def propositions_filter(self, queryset):
+def get_query(self):
     query = self.request.GET.get('query')
     try:
         query_int = int(query)
     except (ValueError, TypeError):
         query_int = -1
+
+    return (query, query_int)
+
+
+def propositions_filter(self, queryset):
+    (query, query_int) = get_query(self)
 
     if query:
         queryset = queryset.filter(
@@ -21,11 +27,7 @@ def propositions_filter(self, queryset):
 
 
 def user_votes_filter(self, queryset):
-    query = self.request.GET.get('query')
-    try:
-        query_int = int(query)
-    except (ValueError, TypeError):
-        query_int = -1
+    (query, query_int) = get_query(self)
 
     if query:
         queryset = queryset.filter(
