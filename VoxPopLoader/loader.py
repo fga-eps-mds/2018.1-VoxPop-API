@@ -265,8 +265,12 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
                     'name':
                         parliamentary_result['ultimoStatus']['nomeEleitoral'],
                     'gender': parliamentary_result['sexo'],
+                    'partido': parliamentary_result['ultimoStatus']['siglaPartido'],
                     'federal_unit':
                         parliamentary_result['ultimoStatus']['siglaUf'],
+                    'birth_date': parliamentary_result['dataNascimento'],
+                    'education': parliamentary_result['escolaridade'],
+                    'email': parliamentary_result['ultimoStatus']['gabinete']['email'],
                     'photo': parliamentary_result['ultimoStatus']['urlFoto']
                 }
 
