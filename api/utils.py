@@ -1,17 +1,15 @@
 from django.db.models import Q
 
-from .models import Proposition
 
-
-def propositions_filter(self):
+def propositions_filter(self, queryset):
     query = self.request.GET.get('query')
     try:
         query_int = int(query)
-    except ValueError:
+    except (ValueError, TypeError):
         query_int = -1
 
     if query:
-        queryset = Proposition.objects.filter(
+        queryset = queryset.filter(
             Q(abstract__contains=query) |
             Q(number__contains=query) |
             Q(proposition_type__contains=query) |

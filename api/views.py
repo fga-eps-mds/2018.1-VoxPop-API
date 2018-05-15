@@ -519,10 +519,10 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                          mixins.ListModelMixin,
                          viewsets.GenericViewSet):
     serializer_class = PropositionSerializer
-    queryset = Proposition.objects.all().order_by('-year')
 
     def get_queryset(self):
-        return propositions_filter(self)
+        queryset = Proposition.objects.all().order_by('-year')
+        return propositions_filter(self, queryset)
 
     @list_route(methods=['get'])
     def non_voted(self, request):
