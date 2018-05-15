@@ -16,6 +16,7 @@ from .serializers import (
     ParliamentarySerializer, PropositionSerializer,
     SocialInformationSerializer, UserSerializer, UserVoteSerializer
 )
+from .utils import propositions_filter
 
 
 class SocialInformationViewset(mixins.RetrieveModelMixin,
@@ -521,22 +522,7 @@ class PropositionViewset(mixins.RetrieveModelMixin,
     queryset = Proposition.objects.all().order_by('-year')
 
     def get_queryset(self):
-        query = self.request.GET.get('query')
-        try:
-            query_int = int(query)
-        except ValueError:
-            query_int = -1
-
-        if query:
-            queryset = Proposition.objects.filter(
-                Q(abstract__contains=query) |
-                Q(number__contains=query) |
-                Q(proposition_type__contains=query) |
-                Q(proposition_type_initials__contains=query) |
-                Q(year=query_int)
-            )
-
-        return queryset
+        return propositions_filter(self)
 
     @list_route(methods=['get'])
     def non_voted(self, request):
