@@ -2,7 +2,6 @@ import json
 from base64 import b64encode
 
 from django.contrib.auth.models import User
-from django.db.models import Q
 
 from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -16,7 +15,7 @@ from .serializers import (
     ParliamentarySerializer, PropositionSerializer,
     SocialInformationSerializer, UserSerializer, UserVoteSerializer
 )
-from .utils import propositions_filter
+from .utils import propositions_filter, user_votes_filter
 
 
 class SocialInformationViewset(mixins.RetrieveModelMixin,
@@ -570,7 +569,7 @@ class UserVoteViewset(viewsets.ModelViewSet):
         else:
             queryset = UserVote.objects.none()
 
-        return queryset
+        return user_votes_filter(self, queryset)
 
     def list(self, request):
         response = super(UserVoteViewset, self).list(request)
