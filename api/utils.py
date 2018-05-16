@@ -39,3 +39,16 @@ def user_votes_filter(self, queryset):
         )
 
     return queryset
+
+
+def parliamentarians_filter(self, queryset):
+    query = self.request.GET.get('query')
+
+    if query:
+        queryset = queryset.filter(
+            Q(name__contains=query) |
+            Q(political_party__contains=query) |
+            Q(federal_unit__contains=query)
+        )
+
+    return queryset
