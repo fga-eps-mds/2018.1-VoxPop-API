@@ -57,7 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
         updated = User(**updatedUser)
         if 'password' in validated_data:
             updated.set_password(validated_data['password'])
-
+        updated.save()
         return updated
 
 

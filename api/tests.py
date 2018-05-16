@@ -66,17 +66,16 @@ class UserTests(APITestCase):
         """
         self.assertEqual(self.user.username, 'teste')
         data = {
-            'username':'updated',
-            'first_name':'teste',
+            'username':'teste',
+            'first_name':'updated',
             'last_name':'teste',
             'email':'teste@teste.com',
             'password':'teste'
         }
         response = self.client.put(self.url + str(self.user.pk) + '/', data)
-
         new_user = User.objects.get(pk=self.user.pk)
         self.assertEqual(response.status_code,  status.HTTP_200_OK)
-        self.assertEqual(new_user.username, 'updated')
+        self.assertEqual(new_user.first_name, data['first_name'])
 
     def test_invalid_update_user(self):
         """
