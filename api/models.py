@@ -137,3 +137,17 @@ class UserVote(Vote):
         on_delete=models.DO_NOTHING,
         related_name='votes'
     )
+
+
+class UserFollowing(models.Model):
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name='following'
+    )
+    parliamentary = models.ForeignKey(
+        Parliamentary,
+        on_delete=models.DO_NOTHING,
+        related_name='followers'
+    )
