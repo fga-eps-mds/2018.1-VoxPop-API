@@ -49,26 +49,16 @@ class UserSerializer(serializers.ModelSerializer):
         token.save()
         return voxpopuser
 
-
     def update(self, instance, validated_data):
         updatedUser = vars(instance)
         del(updatedUser['_state'])
-        print('\n\n\n\n{}\n\n\n\n'.format(updatedUser))
         for field, value in validated_data.items():
             updatedUser[field] = value
-        print('\n\n\n\n{}\n\n\n\n'.format(updatedUser))
         updated = User(**updatedUser)
         if 'password' in validated_data:
             updated.set_password(validated_data['password'])
-        
+
         return updated
-        # updated = User(**validated_data)
-        # toptop = vars(updated)
-        # print('\n\n\n\n{}\n\n\n\n'.format(toptop))
-        # updated.id = instance.id
-        # password = validated_data['password']
-        # updated.set_password(password)
-        # return instance
 
 
 class ParliamentarySerializer(serializers.ModelSerializer):
