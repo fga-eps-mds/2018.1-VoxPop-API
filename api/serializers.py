@@ -54,6 +54,7 @@ class ParliamentarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Parliamentary
         fields = [
+            'id',
             'parliamentary_id',
             'name',
             'gender',
