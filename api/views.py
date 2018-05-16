@@ -15,7 +15,9 @@ from .serializers import (
     ParliamentarySerializer, PropositionSerializer,
     SocialInformationSerializer, UserSerializer, UserVoteSerializer
 )
-from .utils import propositions_filter, user_votes_filter
+from .utils import (
+    parliamentarians_filter, propositions_filter, user_votes_filter
+)
 
 
 class SocialInformationViewset(mixins.RetrieveModelMixin,
@@ -511,7 +513,10 @@ class ParliamentaryViewset(mixins.RetrieveModelMixin,
                            mixins.ListModelMixin,
                            viewsets.GenericViewSet):
     serializer_class = ParliamentarySerializer
-    queryset = Parliamentary.objects.all()
+
+    def get_queryset(self):
+        queryset = Parliamentary.objects.all()
+        return parliamentarians_filter(self, queryset)
 
 
 class PropositionViewset(mixins.RetrieveModelMixin,
