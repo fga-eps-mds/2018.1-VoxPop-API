@@ -212,6 +212,7 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
         _parliamentarians_result = None
         _parliamentarians_ids_list = []
         _page = 1
+        us = 'ultimoStatus'
 
         while _parliamentarians_result != []:
 
@@ -246,39 +247,52 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
 
             if str(parliamentary_id) not in existing_parliamentarians_list:
 
-                request_url = \
-                    self.__get_concatenated_url(
-                        self._specific_parliamentary_url,
-                        parliamentary_id
+                try:
+                    request_url = \
+                        self.__get_concatenated_url(
+                            self._specific_parliamentary_url,
+                            parliamentary_id
+                        )
+
+                    result = requests.get(
+                        request_url,
+                        headers={"content-type": "application/json"}
                     )
 
-                result = requests.get(
-                    request_url,
-                    headers={"content-type": "application/json"}
-                )
+                    parliamentary_result = \
+                        json.loads(result.content)['dados']
 
-                parliamentary_result = \
-                    json.loads(result.content)['dados']
+                    specific_parliamentary_dict = {
+                        'parliamentary_id': parliamentary_result['id'],
+                        'name': parliamentary_result[us]['nomeEleitoral'],
+                        'gender': parliamentary_result['sexo'],
+                        'political_party':
+                            parliamentary_result[us]['siglaPartido'],
+                        'federal_unit': parliamentary_result[us]['siglaUf'],
+                        'birth_date': parliamentary_result['dataNascimento'],
+                        'education': parliamentary_result['escolaridade'],
+                        'email': parliamentary_result[us]['gabinete']['email'],
+                        'photo': parliamentary_result[us]['urlFoto']
+                    }
 
-                specific_parliamentary_dict = {
-                    'parliamentary_id': parliamentary_result['id'],
-                    'name':
-                        parliamentary_result['ultimoStatus']['nomeEleitoral'],
-                    'gender': parliamentary_result['sexo'],
-                    'federal_unit':
-                        parliamentary_result['ultimoStatus']['siglaUf'],
-                    'photo': parliamentary_result['ultimoStatus']['urlFoto']
-                }
+                    requests.post(
+                        self.create_parliamentary_url,
+                        data=specific_parliamentary_dict,
+                        params={
+                            "key": VoxPopLoaderTCPHandler.__get_credentials()
+                        }
+                    )
+                    # Parliamentary.objects.create(**specific_parliamentary_dict)
 
-                requests.post(
-                    self.create_parliamentary_url,
-                    data=specific_parliamentary_dict,
-                    params={"key": VoxPopLoaderTCPHandler.__get_credentials()}
-                )
-                # Parliamentary.objects.create(**specific_parliamentary_dict)
+                    logger.info("Parliamentary " + str(parliamentary_id) +
+                                " saved!")
 
-                logger.info("Parliamentary " + str(parliamentary_id) +
-                            " saved!")
+                except Exception as e:
+                    logger.error(
+                        "An error has occurred trying to save" +
+                        " parliamentary " + str(parliamentary_id) + " data."
+                    )
+                    logger.error(str(e))
 
             else:
                 logger.warning("Parliamentary " + str(parliamentary_id) +
@@ -403,7 +417,7 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
                         logger.info(
                             "{} has requested VoxPopLoader to get".format(
                                 self.client_address[0]
-                            ) + "parliamentarians data."
+                            ) + " parliamentarians data."
                         )
                         self.__get_parliamentarians()
                         self.__send_ok_response("get_parliamentarians")
@@ -411,7 +425,7 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
                     except Exception as e:
                         logger.error(
                             "An error has occurred trying to get" +
-                            "parliamentarians data."
+                            " parliamentarians data."
                         )
                         logger.error(str(e))
 
@@ -421,7 +435,7 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
                         logger.info(
                             "{} has requested VoxPopLoader to get".format(
                                 self.client_address[0]
-                            ) + "propositions data."
+                            ) + " propositions data."
                         )
                         self.__get_propositions()
                         self.__send_ok_response("get_propositions")
@@ -429,7 +443,7 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
                     except Exception as e:
                         logger.error(
                             "An error has occurred trying to get" +
-                            "propositions data."
+                            " propositions data."
                         )
                         logger.error(str(e))
 

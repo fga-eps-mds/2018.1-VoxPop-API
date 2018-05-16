@@ -57,7 +57,11 @@ class ParliamentarySerializer(serializers.ModelSerializer):
             'parliamentary_id',
             'name',
             'gender',
+            'political_party',
             'federal_unit',
+            'birth_date',
+            'education',
+            'email',
             'photo'
         ]
 
