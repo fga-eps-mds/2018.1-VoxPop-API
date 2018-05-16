@@ -87,7 +87,11 @@ class Parliamentary(models.Model):
     name = models.CharField(max_length=100)
     gender = \
         models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True)
+    political_party = models.CharField(max_length=100, blank=True)
     federal_unit = models.CharField(max_length=100, blank=True)
+    birth_date = models.CharField(max_length=15, blank=True)
+    education = models.CharField(max_length=150, default='N')
+    email = models.CharField(max_length=100, blank=True)
     photo = models.URLField(blank=True)
 
     def __str__(self):
