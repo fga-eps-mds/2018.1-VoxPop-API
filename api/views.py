@@ -2,6 +2,8 @@ import json
 from base64 import b64encode
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 
 from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -9,11 +11,14 @@ from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from .models import Parliamentary, Proposition, SocialInformation, UserVote
+from .models import (
+    Parliamentary, Proposition, SocialInformation, UserFollowing, UserVote
+)
 from .permissions import SocialInformationPermissions, UserPermissions
 from .serializers import (
     ParliamentarySerializer, PropositionSerializer,
-    SocialInformationSerializer, UserSerializer, UserVoteSerializer
+    SocialInformationSerializer, UserFollowingSerializer, UserSerializer,
+    UserVoteSerializer
 )
 from .utils import (
     parliamentarians_filter, propositions_filter, user_votes_filter
@@ -650,3 +655,116 @@ class CustomObtainToken(ObtainAuthToken):
         response.data['last_name'] = user.last_name
 
         return response
+
+
+class UserFollowingViewset(mixins.ListModelMixin,
+                           mixins.CreateModelMixin,
+                           mixins.DestroyModelMixin,
+                           mixins.RetrieveModelMixin,
+                           viewsets.GenericViewSet):
+
+    serializer_class = UserFollowingSerializer
+    queryset = UserFollowing.objects.all().order_by('parliamentary')
+
+    def get_queryset(self):
+        if not self.request.user.is_anonymous:
+            user = self.request.user
+            queryset = UserFollowing.objects.filter(user=user)
+        else:
+            queryset = UserFollowing.objects.none()
+
+        return queryset
+
+    def list(self, request):
+        response = super(UserFollowingViewset, self).list(request)
+
+        for following in response.data['results']:
+            parliamentary = \
+                Parliamentary.objects.get(pk=following['parliamentary'])
+            parliamentary_serializer = ParliamentarySerializer(parliamentary)
+            following['parliamentary'] = parliamentary_serializer.data
+
+        return response
+
+    def create(self, request):
+        try:
+            user_id = request.user.id
+            request.data['user'] = user_id
+
+            if UserFollowing.objects.filter(
+                user=request.user,
+                parliamentary__id=request.data['parliamentary']
+            ):
+                response = {
+                    'detail': 'Already exists.'
+                }
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+            response = super(UserFollowingViewset, self).create(request)
+
+            parliamentary = \
+                Parliamentary.objects.get(pk=response.data['parliamentary'])
+            parliamentary_serializer = ParliamentarySerializer(parliamentary)
+            response.data['parliamentary'] = parliamentary_serializer.data
+        except (IntegrityError, TypeError):
+            response = {
+                'detail': 'Anauthorized.'
+            }
+            return Response(response, status=status.HTTP_401_UNAUTHORIZED)
+
+        return response
+
+    def destroy(self, request, pk=None):
+        try:
+            if UserFollowing.objects.filter(
+                user=request.user,
+                parliamentary__id=pk
+            ):
+                UserFollowing.objects.get(
+                    user=request.user,
+                    parliamentary__id=pk
+                ).delete()
+                response = {
+                    'detail': 'Deleted.'
+                }
+                return Response(response, status=status.HTTP_204_NO_CONTENT)
+            else:
+                response = {
+                    'detail': 'Not exists.'
+                }
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        except (IntegrityError, TypeError):
+            response = {
+                'detail': 'Anauthorized.'
+            }
+            return Response(response, status=status.HTTP_401_UNAUTHORIZED)
+
+        return response
+
+    def retrieve(self, request, pk=None):
+        """
+        Get followed parliamentary by its ID.
+        """
+        try:
+            user_following = UserFollowing.objects.get(
+                user=request.user, parliamentary__id=pk
+            )
+        except (ObjectDoesNotExist, TypeError):
+            response = {
+                'detail': 'Not found.'
+            }
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        user_following_serializer = UserFollowingSerializer(user_following)
+        user_following_dict = dict(user_following_serializer.data)
+
+        parliamentary = \
+            Parliamentary.objects.get(
+                pk=user_following_dict['parliamentary']
+            )
+        parliamentary_serializer = ParliamentarySerializer(parliamentary)
+        user_following_dict['parliamentary'] = \
+            parliamentary_serializer.data
+
+        return Response(user_following_dict)

@@ -1,4 +1,6 @@
-from .models import Parliamentary, Proposition, SocialInformation, UserVote
+from .models import (
+    Parliamentary, Proposition, SocialInformation, UserFollowing, UserVote
+)
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -93,3 +95,18 @@ class UserVoteSerializer(serializers.ModelSerializer):
             'proposition',
             'option'
         ]
+
+
+class UserFollowingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserFollowing
+        fields = [
+            'user',
+            'parliamentary'
+        ]
+
+        extra_kwargs = {
+            'user': {
+                'write_only': True
+            },
+        }
