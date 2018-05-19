@@ -62,6 +62,17 @@ GENDER_CHOICES = (
     ('F', 'Female'),
 )
 
+INCOME_CHOICES = (
+    ('N', 'Null'),
+    ('0', '0.00-1000.00'),
+    ('1', '1000.01-3000.00'),
+    ('2', '3000.01-6000.00'),
+    ('3', '6000.01-9000.00'),
+    ('4', '9000.01-15000.00'),
+    ('5', '15000.01-25000.00'),
+    ('6', '25000.00+'),
+)
+
 
 class SocialInformation(models.Model):
 
@@ -72,7 +83,7 @@ class SocialInformation(models.Model):
     )
     federal_unit = models.CharField(max_length=150, choices=UF_CHOICES, default='N')
     city = models.CharField(max_length=150, blank=True)
-    income = models.DecimalField(default=0, decimal_places=2, max_digits=9)
+    income = models.CharField(max_length=100, choices=INCOME_CHOICES, default='N')
     education = models.CharField(
         max_length=150, choices=EDUCATION_CHOICES, default='N'
     )
