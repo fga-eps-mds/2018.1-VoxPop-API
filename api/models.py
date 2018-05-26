@@ -116,7 +116,7 @@ class Proposition(models.Model):
         )
 
 
-class Vote(models.Model):
+class UserVote(models.Model):
 
     option = models.CharField(
         max_length=1,
@@ -126,17 +126,38 @@ class Vote(models.Model):
     proposition = models.ForeignKey(
         Proposition,
         on_delete=models.DO_NOTHING,
-        related_name='votes'
+        related_name='user_votes'
     )
-
-
-class UserVote(Vote):
-
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
         related_name='votes'
     )
+
+    class Meta:
+        unique_together = ('proposition', 'user')
+
+
+class ParliamentaryVote(models.Model):
+
+    option = models.CharField(
+        max_length=1,
+        choices=VOTE_CHOICES,
+        blank=True
+    )
+    proposition = models.ForeignKey(
+        Proposition,
+        on_delete=models.DO_NOTHING,
+        related_name='parliamentary_votes'
+    )
+    parliamentary = models.ForeignKey(
+        Parliamentary,
+        on_delete=models.DO_NOTHING,
+        related_name='votes'
+    )
+
+    class Meta:
+        unique_together = ('proposition', 'parliamentary')
 
 
 class UserFollowing(models.Model):
