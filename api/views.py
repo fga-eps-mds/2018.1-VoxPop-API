@@ -4,6 +4,7 @@ from base64 import b64encode
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from django.db.models import Count
 
 from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -12,13 +13,14 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from .models import (
-    Parliamentary, Proposition, SocialInformation, UserFollowing, UserVote
+    Parliamentary, ParliamentaryVote, Proposition, SocialInformation,
+    UserFollowing, UserVote
 )
 from .permissions import SocialInformationPermissions, UserPermissions
 from .serializers import (
-    ParliamentarySerializer, PropositionSerializer,
-    SocialInformationSerializer, UserFollowingSerializer, UserSerializer,
-    UserVoteSerializer
+    ParliamentarySerializer, ParliamentaryVoteSerializer,
+    PropositionSerializer, SocialInformationSerializer,
+    UserFollowingSerializer, UserSerializer, UserVoteSerializer
 )
 from .utils import (
     parliamentarians_filter, propositions_filter, user_votes_filter
@@ -482,11 +484,21 @@ class LoaderViewSet(ViewSet):
     def get_propositions(self, request):
         if request.query_params.get('key') == \
                 LoaderViewSet.__get_credentials():
-            native_ids = []
-            for proposition in Proposition.objects.all():
-                native_ids.append(proposition.native_id)
 
-            response = Response(native_ids, status=status.HTTP_200_OK)
+            propositions = Proposition.objects.all().order_by('-year')
+            propositions_list = []
+
+            for proposition in propositions:
+                propositions_list.append(
+                    {
+                        'year': proposition.year,
+                        'type': proposition.proposition_type_initials,
+                        'number': proposition.number,
+                        'native_id': proposition.native_id
+                    }
+                )
+
+            response = Response(propositions_list, status=status.HTTP_200_OK)
 
         else:
             response = Response(
@@ -502,6 +514,46 @@ class LoaderViewSet(ViewSet):
                 LoaderViewSet.__get_credentials():
             proposition_dict = request.data.dict()
             Proposition.objects.create(**proposition_dict)
+
+            response = Response({"status": "OK"}, status=status.HTTP_200_OK)
+
+        else:
+            response = Response(
+                {'status': 'Unauthorized'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        return response
+
+    @list_route(methods=['post'])
+    def create_vote(self, request):
+        if request.query_params.get('key') == \
+                LoaderViewSet.__get_credentials():
+
+            votes_list = json.loads(request.data['votes_list'])
+            create_list = []
+
+            for vote in votes_list:
+
+                try:
+                    parliamentary = Parliamentary.objects.get(
+                        parliamentary_id=vote['parliamentary']
+                    )
+                    vote['parliamentary'] = parliamentary
+
+                    proposition = Proposition.objects.get(
+                        native_id=vote['proposition']
+                    )
+                    vote['proposition'] = proposition
+
+                    create_list.append(ParliamentaryVote(**vote))
+
+                    # ParliamentaryVote.objects.create(**vote)
+
+                except ObjectDoesNotExist:
+                    pass
+
+            ParliamentaryVote.objects.bulk_create(create_list)
 
             response = Response({"status": "OK"}, status=status.HTTP_200_OK)
 
@@ -534,7 +586,11 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         return propositions_filter(self, queryset)
 
     @list_route(methods=['get'])
-    def non_voted(self, request):
+    def non_voted_by_user(self, request):
+        """
+        Returns one proposition non voted by the current user.
+        """
+
         user = request.user
         proposition_voted = []
 
@@ -565,6 +621,35 @@ class PropositionViewset(mixins.RetrieveModelMixin,
             )
 
         return response
+
+    @list_route(methods=['get'])
+    def voted_by_parliamentary(self, request):
+        """
+        Returns all propositions voted by parliamentarians.
+        """
+
+        proposition_voted = ParliamentaryVote.objects.values(
+            'proposition'
+        ).annotate(count=Count('proposition'))
+
+        proposition_voted_ids = []
+        for proposition in proposition_voted:
+            proposition_voted_ids.append(proposition['proposition'])
+
+        queryset = Proposition.objects.filter(
+            id__in=proposition_voted_ids
+        ).order_by('-year')
+
+        # serializer = PropositionSerializer(queryset, many=True)
+        # return Response(serializer.data)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class UserVoteViewset(viewsets.ModelViewSet):
