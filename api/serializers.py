@@ -1,5 +1,6 @@
 from .models import (
-    Parliamentary, Proposition, SocialInformation, UserFollowing, UserVote
+    Parliamentary, ParliamentaryVote, Proposition, SocialInformation,
+    UserFollowing, UserVote
 )
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -103,6 +104,17 @@ class UserVoteSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'user',
+            'proposition',
+            'option'
+        ]
+
+
+class ParliamentaryVoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ParliamentaryVote
+        fields = [
+            'id',
+            'parliamentary',
             'proposition',
             'option'
         ]
