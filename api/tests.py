@@ -43,7 +43,6 @@ class UserTests(APITestCase):
         Ensure we can create a user object.
         """
         response = self.client.get(self.url + str(self.user.pk) + '/')
-        # new_user = User.objects.get(pk=self.user.pk)
         self.assertEqual(response.status_code,  status.HTTP_200_OK)
 
     def test_invalid_create_user(self):
@@ -156,7 +155,6 @@ class SocialInformationTests(APITestCase):
         This method will run after any test.
         """
         self.user.delete()
-        # self.social.delete()
 
     def test_create_social(self):
         """
@@ -175,7 +173,7 @@ class SocialInformationTests(APITestCase):
             "owner": self.user,
             "federal_unit": "AC",
             "city": "Rio Branco",
-            "income": "10.00",
+            "income": "2",
             "education": "EFC",
             "job": "Dono de Casa",
             "birth_date": "2018-01-01"
@@ -198,7 +196,7 @@ class SocialInformationTests(APITestCase):
             "owner": self.user.pk,
             "federal_unit": "AC",
             "city": "Rio Branco",
-            "income": "10.00",
+            "income": "2",
             "education": "EFC",
             "job": "Dono de Prédio",
             "birth_date": "2018-04-07"
@@ -218,7 +216,7 @@ class SocialInformationTests(APITestCase):
             "owner": self.user.pk,
             "federal_unit": "AC",
             "city": "Rio Branco",
-            "income": "10.00",
+            "income": "2",
             "education": "EFC",
             "job": "Dono de Casa",
             "birth_date": "20180-43-213"
