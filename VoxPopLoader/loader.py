@@ -478,8 +478,8 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
 
             count += 1
 
-            logger.debug('Tried ' + str(count))
-            logger.debug(proposition)
+            # logger.debug('Tried ' + str(count))
+            # logger.debug(proposition)
 
             if str(vote_request.status_code) == '200':
 
