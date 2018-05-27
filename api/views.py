@@ -868,9 +868,17 @@ class StatisticViewset(viewsets.GenericViewSet):
 
         most_active = ParliamentaryVote.objects.filter(
             Q(option='S') | Q(option='N')
-        ).values('parliamentary__name').annotate(
+        ).values('parliamentary').annotate(
             votes=Count('option')
         ).order_by('-votes')
+
+        for parliamentary in most_active:
+            parliamentary_obj = Parliamentary.objects.get(
+                id=parliamentary['parliamentary']
+            )
+            parliamentary['parliamentary'] = ParliamentarySerializer(
+                parliamentary_obj
+            ).data
 
         paginator = LimitOffsetPagination()
 
@@ -879,3 +887,30 @@ class StatisticViewset(viewsets.GenericViewSet):
             return paginator.get_paginated_response(page)
 
         return Response(most_active)
+
+    @list_route(methods=['get'])
+    def most_followed(self, request):
+        """
+        Returns parliamentarians in followers count order.
+        """
+
+        most_followed = Parliamentary.objects.values('id').annotate(
+            followers=Count('followers')
+        ).order_by('-followers')
+
+        for parliamentary in most_followed:
+            parliamentary_obj = Parliamentary.objects.get(
+                id=parliamentary['id']
+            )
+            del parliamentary['id']
+            parliamentary['parliamentary'] = ParliamentarySerializer(
+                parliamentary_obj
+            ).data
+
+        paginator = LimitOffsetPagination()
+
+        page = paginator.paginate_queryset(most_followed, request)
+        if page is not None:
+            return paginator.get_paginated_response(page)
+
+        return Response(most_followed)
