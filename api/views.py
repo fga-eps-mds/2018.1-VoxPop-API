@@ -4,11 +4,12 @@ from base64 import b64encode
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import list_route
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
@@ -853,3 +854,28 @@ class UserFollowingViewset(mixins.ListModelMixin,
             parliamentary_serializer.data
 
         return Response(user_following_dict)
+
+
+class StatisticViewset(viewsets.GenericViewSet):
+
+    queryset = Parliamentary.objects.all()
+
+    @list_route(methods=['get'])
+    def most_active(self, request):
+        """
+        Returns parliamentarians in votes count order.
+        """
+
+        most_active = ParliamentaryVote.objects.filter(
+            Q(option='S') | Q(option='N')
+        ).values('parliamentary__name').annotate(
+            votes=Count('option')
+        ).order_by('-votes')
+
+        paginator = LimitOffsetPagination()
+
+        page = paginator.paginate_queryset(most_active, request)
+        if page is not None:
+            return paginator.get_paginated_response(page)
+
+        return Response(most_active)

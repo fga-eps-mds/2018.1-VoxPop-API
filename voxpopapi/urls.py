@@ -1,7 +1,7 @@
 from api.views import (
     CustomObtainToken, LoaderViewSet, ParliamentaryViewset, PropositionViewset,
-    SocialInformationViewset, UserFollowingViewset, UserViewset,
-    UserVoteViewset
+    SocialInformationViewset, StatisticViewset, UserFollowingViewset,
+    UserViewset, UserVoteViewset
 )
 
 from django.conf.urls import include, url
@@ -21,6 +21,7 @@ router.register(r'parliamentarians', ParliamentaryViewset, 'parliamentarians')
 router.register(r'propositions', PropositionViewset, 'propositions')
 router.register(r'user_votes', UserVoteViewset, 'user_votes')
 router.register(r'user_following', UserFollowingViewset, 'user_following')
+router.register(r'statistics', StatisticViewset, 'statistics')
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
