@@ -332,10 +332,6 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
         start_time = time.time()
         logger.info("Started getting propositions data...")
 
-        _propositions_result = None
-        _propositions_ids_list = []
-        _page = 1
-
         # years_list = ['2015', '2016', '2017', '2018']
         #
         # for year in years_list:
@@ -346,7 +342,8 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
         for year in years:
 
             voted_r = requests.get(
-                'http://www.camara.leg.br/SitCamaraWS/Proposicoes.asmx/ListarProposicoesVotadasEmPlenario?ano={year}&tipo='.format(
+                'http://www.camara.leg.br/SitCamaraWS/Proposicoes.asmx/' +
+                'ListarProposicoesVotadasEmPlenario?ano={year}&tipo='.format(
                     year=year
                 )
             )
@@ -491,6 +488,11 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
 
                 root = ET.fromstring(str(vote_request.content, 'utf-8'))
 
+                max_date = datetime.datetime.strptime(
+                    '01/01/1990',
+                    '%d/%m/%Y'
+                ).date()
+
                 for voting in root.find('Votacoes'):
 
                     date = datetime.datetime.strptime(
@@ -498,12 +500,7 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
                         '%d/%m/%Y'
                     ).date()
 
-                    try:
-                        if date > max_date:
-                            max_date = date
-                            recent_voting = voting
-
-                    except NameError:
+                    if date > max_date:
                         max_date = date
                         recent_voting = voting
 

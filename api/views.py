@@ -19,9 +19,9 @@ from .models import (
 )
 from .permissions import SocialInformationPermissions, UserPermissions
 from .serializers import (
-    ParliamentarySerializer, ParliamentaryVoteSerializer,
-    PropositionSerializer, SocialInformationSerializer,
-    UserFollowingSerializer, UserSerializer, UserVoteSerializer
+    ParliamentarySerializer, PropositionSerializer,
+    SocialInformationSerializer, UserFollowingSerializer, UserSerializer,
+    UserVoteSerializer
 )
 from .utils import (
     parliamentarians_filter, propositions_filter, user_votes_filter
