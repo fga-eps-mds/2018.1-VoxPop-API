@@ -91,7 +91,7 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
             base=self.base_url
         )
 
-        self.api_base_url = "localhost:8000"
+        self.api_base_url = "api:8000"
         self.propositions_url = \
             "http://{base}/api/propositions/?limit=10000".format(
                 base=self.api_base_url
