@@ -52,3 +52,16 @@ def parliamentarians_filter(self, queryset):
         )
 
     return queryset
+
+
+def user_following_filter(self, queryset):
+    query = self.request.GET.get('query')
+
+    if query:
+        queryset = queryset.filter(
+            Q(parliamentary__name__contains=query) |
+            Q(parliamentary__political_party__contains=query) |
+            Q(parliamentary__federal_unit__contains=query)
+        )
+
+    return queryset
