@@ -24,7 +24,10 @@ from .serializers import (
     UserVoteSerializer
 )
 from .utils import (
-    parliamentarians_filter, propositions_filter, user_votes_filter, user_following_filter
+    parliamentarians_filter,
+    propositions_filter,
+    user_votes_filter,
+    user_following_filter
 )
 
 
