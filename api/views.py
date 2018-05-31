@@ -601,8 +601,18 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         try:
             for vote in user.votes.all():
                 proposition_voted.append(vote.proposition)
+            
+            proposition_voted = ParliamentaryVote.objects.values(
+                'proposition'
+            ).annotate(count=Count('proposition'))
 
-            all_propositions = Proposition.objects.all().order_by('-year')
+            proposition_voted_ids = []
+            for proposition in proposition_voted:
+                proposition_voted_ids.append(proposition['proposition'])
+
+            all_propositions = Proposition.objects.filter(
+                id__in=proposition_voted_ids
+            ).order_by('-year')
 
             response = Response(
                 {'status': 'No Content'},
