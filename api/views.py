@@ -24,7 +24,10 @@ from .serializers import (
     UserVoteSerializer
 )
 from .utils import (
-    parliamentarians_filter, propositions_filter, user_votes_filter
+    parliamentarians_filter,
+    propositions_filter,
+    user_votes_filter,
+    user_following_filter
 )
 
 
@@ -759,7 +762,7 @@ class UserFollowingViewset(mixins.ListModelMixin,
         else:
             queryset = UserFollowing.objects.none()
 
-        return queryset
+        return user_following_filter(self, queryset)
 
     def list(self, request):
         response = super(UserFollowingViewset, self).list(request)
