@@ -601,7 +601,7 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         try:
             for vote in user.votes.all():
                 proposition_voted_by_user.append(vote.proposition)
-            
+
             proposition_voted = ParliamentaryVote.objects.values(
                 'proposition'
             ).annotate(count=Count('proposition'))
