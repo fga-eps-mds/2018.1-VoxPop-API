@@ -596,13 +596,23 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         """
 
         user = request.user
-        proposition_voted = []
+        proposition_voted_by_user = []
 
         try:
             for vote in user.votes.all():
-                proposition_voted.append(vote.proposition)
+                proposition_voted_by_user.append(vote.proposition)
 
-            all_propositions = Proposition.objects.all().order_by('-year')
+            proposition_voted = ParliamentaryVote.objects.values(
+                'proposition'
+            ).annotate(count=Count('proposition'))
+
+            proposition_voted_ids = []
+            for proposition in proposition_voted:
+                proposition_voted_ids.append(proposition['proposition'])
+
+            all_propositions = Proposition.objects.filter(
+                id__in=proposition_voted_ids
+            ).order_by('-year')
 
             response = Response(
                 {'status': 'No Content'},
@@ -610,7 +620,7 @@ class PropositionViewset(mixins.RetrieveModelMixin,
             )
 
             for proposition in all_propositions:
-                if proposition not in proposition_voted:
+                if proposition not in proposition_voted_by_user:
                     proposition_serialized = PropositionSerializer(proposition)
                     response = Response(
                         proposition_serialized.data,
