@@ -596,11 +596,11 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         """
 
         user = request.user
-        proposition_voted = []
+        proposition_voted_by_user = []
 
         try:
             for vote in user.votes.all():
-                proposition_voted.append(vote.proposition)
+                proposition_voted_by_user.append(vote.proposition)
             
             proposition_voted = ParliamentaryVote.objects.values(
                 'proposition'
@@ -620,7 +620,7 @@ class PropositionViewset(mixins.RetrieveModelMixin,
             )
 
             for proposition in all_propositions:
-                if proposition not in proposition_voted:
+                if proposition not in proposition_voted_by_user:
                     proposition_serialized = PropositionSerializer(proposition)
                     response = Response(
                         proposition_serialized.data,
