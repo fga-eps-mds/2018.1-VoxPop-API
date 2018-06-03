@@ -71,6 +71,10 @@ def user_following_filter(self, queryset):
 
 def update_compatibility(self):
 
+    # Constants
+    A = 1
+    B = 2
+
     all_parliamentarians_ids = Parliamentary.objects.all().values_list(
         'id',
         flat=True
@@ -161,11 +165,15 @@ def update_compatibility(self):
                 try:
                     compatibility['compatibility'] = (
                         compatibility['matching_votes'] * (
-                            self.request.user.votes.count() +
-                            compatibility['valid_votes']
+                            self.request.user.votes.filter(
+                                Q(option='Y') | Q(option='N')
+                            ).count()*A +
+                            compatibility['valid_votes']*B
                         ) / (
                             compatibility['valid_votes'] *
-                            self.request.user.votes.count() * 2
+                            self.request.user.votes.filter(
+                                Q(option='Y') | Q(option='N')
+                            ).count() * (A+B)
                         )
                     ) * 100
                 except ZeroDivisionError:
