@@ -901,7 +901,7 @@ class StatisticViewset(viewsets.GenericViewSet):
         """
 
         most_active = ParliamentaryVote.objects.filter(
-            Q(option='S') | Q(option='N')
+            Q(option='Y') | Q(option='N')
         ).values('parliamentary').annotate(
             votes=Count('option')
         ).order_by('-votes')
