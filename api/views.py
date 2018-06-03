@@ -904,7 +904,7 @@ class StatisticViewset(viewsets.GenericViewSet):
             Q(option='Y') | Q(option='N')
         ).values('parliamentary').annotate(
             votes=Count('option')
-        ).order_by('-votes')
+        ).order_by('-votes', 'parliamentary__name')
 
         for parliamentary in most_active:
             parliamentary_obj = Parliamentary.objects.get(
@@ -930,7 +930,7 @@ class StatisticViewset(viewsets.GenericViewSet):
 
         most_followed = Parliamentary.objects.values('id').annotate(
             followers=Count('followers')
-        ).order_by('-followers')
+        ).order_by('-followers', 'name')
 
         for parliamentary in most_followed:
             parliamentary_obj = Parliamentary.objects.get(
