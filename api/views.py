@@ -14,12 +14,12 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from .models import (
-    Parliamentary, ParliamentaryVote, Proposition, SocialInformation,
-    UserFollowing, UserVote
+    ExtendedUser, Parliamentary, ParliamentaryVote, Proposition,
+    SocialInformation, UserFollowing, UserVote
 )
 from .permissions import SocialInformationPermissions, UserPermissions
 from .serializers import (
-    ParliamentarySerializer, PropositionSerializer,
+    CompatibilitySerializer, ParliamentarySerializer, PropositionSerializer,
     SocialInformationSerializer, UserFollowingSerializer, UserSerializer,
     UserVoteSerializer
 )
@@ -27,7 +27,8 @@ from .utils import (
     parliamentarians_filter,
     propositions_filter,
     user_votes_filter,
-    user_following_filter
+    user_following_filter,
+    update_compatibility
 )
 
 
@@ -694,6 +695,11 @@ class UserVoteViewset(viewsets.ModelViewSet):
         user_id = request.user.id
         request.data['user'] = user_id
 
+        extended_user = ExtendedUser.objects.get(user=request.user)
+        if extended_user.should_update is False:
+            extended_user.should_update = True
+            extended_user.save()
+
         response = super(UserVoteViewset, self).create(request)
 
         proposition = Proposition.objects.get(pk=response.data['proposition'])
@@ -703,6 +709,11 @@ class UserVoteViewset(viewsets.ModelViewSet):
         return response
 
     def destroy(self, request, pk=None):
+        extended_user = ExtendedUser.objects.get(user=request.user)
+        if extended_user.should_update is False:
+            extended_user.should_update = True
+            extended_user.save()
+
         response = super(UserVoteViewset, self).destroy(request, pk)
         return response
 
@@ -719,6 +730,11 @@ class UserVoteViewset(viewsets.ModelViewSet):
         user_id = request.user.id
         request.data['user'] = user_id
 
+        extended_user = ExtendedUser.objects.get(user=request.user)
+        if extended_user.should_update is False:
+            extended_user.should_update = True
+            extended_user.save()
+
         response = super(UserVoteViewset, self).partial_update(
             request,
             pk,
@@ -728,6 +744,11 @@ class UserVoteViewset(viewsets.ModelViewSet):
     def update(self, request, pk=None, **kwargs):
         user_id = request.user.id
         request.data['user'] = user_id
+
+        extended_user = ExtendedUser.objects.get(user=request.user)
+        if extended_user.should_update is False:
+            extended_user.should_update = True
+            extended_user.save()
 
         response = super(UserVoteViewset, self).update(
             request,
@@ -927,3 +948,41 @@ class StatisticViewset(viewsets.GenericViewSet):
             return paginator.get_paginated_response(page)
 
         return Response(most_followed)
+
+    @list_route(methods=['get'])
+    def most_compatible(self, request):
+        """
+        Returns parliamentarians in compatibility order.
+        """
+
+        extended_user = ExtendedUser.objects.get(user=request.user)
+
+        if extended_user.should_update:
+            update_compatibility(self)
+            extended_user.should_update = False
+            extended_user.save()
+
+        compatibilities = request.user.compatibilities.all().order_by(
+            '-compatibility'
+        )
+        compatibilities_list = list()
+
+        for compatibility in compatibilities:
+
+            compatibility_serialized = CompatibilitySerializer(
+                compatibility
+            ).data
+            del compatibility_serialized['user']
+            compatibility_serialized['compatibility'] = "{}%".format(
+                round(compatibility_serialized['compatibility'], 2)
+            )
+
+            compatibilities_list.append(compatibility_serialized)
+
+        paginator = LimitOffsetPagination()
+
+        page = paginator.paginate_queryset(compatibilities_list, request)
+        if page is not None:
+            return paginator.get_paginated_response(page)
+
+        return Response(compatibilities_list)

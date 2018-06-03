@@ -515,6 +515,8 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
 
                     if specific_vote_dict['option'] == '-':
                         specific_vote_dict['option'] = 'M'
+                    elif specific_vote_dict['option'] == 'S':
+                        specific_vote_dict['option'] = 'Y'
 
                     votes_list.append(specific_vote_dict)
 

@@ -183,3 +183,30 @@ class UserFollowing(models.Model):
         on_delete=models.DO_NOTHING,
         related_name='followers'
     )
+
+
+class Compatibility(models.Model):
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name='compatibilities'
+    )
+    parliamentary = models.ForeignKey(
+        Parliamentary,
+        on_delete=models.DO_NOTHING,
+        related_name='user_compatibilities'
+    )
+    valid_votes = models.IntegerField(blank=True)
+    matching_votes = models.IntegerField(blank=True)
+    compatibility = models.FloatField(blank=True)
+
+
+class ExtendedUser(models.Model):
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.DO_NOTHING,
+        related_name='extended_user'
+    )
+    should_update = models.BooleanField(default=True)

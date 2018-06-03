@@ -1,6 +1,6 @@
 from .models import (
-    Parliamentary, ParliamentaryVote, Proposition, SocialInformation,
-    UserFollowing, UserVote
+    Compatibility, ExtendedUser, Parliamentary, ParliamentaryVote, Proposition,
+    SocialInformation, UserFollowing, UserVote
 )
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -50,6 +50,8 @@ class UserSerializer(serializers.ModelSerializer):
         voxpopuser.save()
         token = Token.objects.create(user=voxpopuser)
         token.save()
+        extended_user = ExtendedUser.objects.create(user=voxpopuser)
+        extended_user.save()
         return voxpopuser
 
     def update(self, instance, validated_data):
@@ -133,3 +135,17 @@ class UserFollowingSerializer(serializers.ModelSerializer):
                 'write_only': True
             },
         }
+
+
+class CompatibilitySerializer(serializers.ModelSerializer):
+    parliamentary = ParliamentarySerializer(many=False)
+
+    class Meta:
+        model = Compatibility
+        fields = [
+            'user',
+            'parliamentary',
+            'valid_votes',
+            'matching_votes',
+            'compatibility'
+        ]
