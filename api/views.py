@@ -580,6 +580,47 @@ class ParliamentaryViewset(mixins.RetrieveModelMixin,
         queryset = Parliamentary.objects.all()
         return parliamentarians_filter(self, queryset)
 
+    def list(self, request):
+        response = super(ParliamentaryViewset, self).list(request)
+
+        if request.user.is_authenticated:
+
+            extended_user = ExtendedUser.objects.get(user=request.user)
+            if extended_user.should_update:
+                update_compatibility(self)
+                extended_user.should_update = False
+                extended_user.save()
+
+            for parliamentary in response.data['results']:
+                compatibility = self.request.user.compatibilities.filter(
+                    parliamentary=parliamentary['id']
+                )[0].compatibility
+                parliamentary['compatibility'] = "{}%".format(
+                    round(compatibility, 2)
+                )
+
+        return response
+
+    def retrieve(self, request, pk=None):
+        response = super(ParliamentaryViewset, self).retrieve(request, pk)
+
+        if request.user.is_authenticated:
+
+            extended_user = ExtendedUser.objects.get(user=request.user)
+            if extended_user.should_update:
+                update_compatibility(self)
+                extended_user.should_update = False
+                extended_user.save()
+
+            compatibility = self.request.user.compatibilities.filter(
+                parliamentary=response.data['id']
+            )[0].compatibility
+            response.data['compatibility'] = "{}%".format(
+                round(compatibility, 2)
+            )
+
+        return response
+
 
 class PropositionViewset(mixins.RetrieveModelMixin,
                          mixins.ListModelMixin,
