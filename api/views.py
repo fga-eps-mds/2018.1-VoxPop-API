@@ -631,6 +631,60 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         queryset = Proposition.objects.all().order_by('-year')
         return propositions_filter(self, queryset)
 
+    def list(self, request):
+        response = super(PropositionViewset, self).list(request)
+
+        for proposition in response.data['results']:
+
+            parliamentarians_total_votes = ParliamentaryVote.objects.filter(
+                proposition=proposition['id']
+            )
+            parliamentarians_approval = parliamentarians_total_votes.filter(
+                option='Y'
+            ).count() / parliamentarians_total_votes.count() * 100
+
+            population_total_votes = UserVote.objects.filter(
+                proposition=proposition['id']
+            )
+            population_approval = population_total_votes.filter(
+                option='Y'
+            ).count() / population_total_votes.count() * 100
+
+            proposition['parliamentarians_approval'] = "{}%".format(
+                round(parliamentarians_approval, 2)
+            )
+            proposition['population_approval'] = "{}%".format(
+                round(population_approval, 2)
+            )
+
+        return response
+
+    def retrieve(self, request, pk=None):
+        response = super(PropositionViewset, self).retrieve(request, pk)
+
+        parliamentarians_total_votes = ParliamentaryVote.objects.filter(
+            proposition=response.data['id']
+        )
+        parliamentarians_approval = parliamentarians_total_votes.filter(
+            option='Y'
+        ).count() / parliamentarians_total_votes.count() * 100
+
+        population_total_votes = UserVote.objects.filter(
+            proposition=response.data['id']
+        )
+        population_approval = population_total_votes.filter(
+            option='Y'
+        ).count() / population_total_votes.count() * 100
+
+        response.data['parliamentarians_approval'] = "{}%".format(
+            round(parliamentarians_approval, 2)
+        )
+        response.data['population_approval'] = "{}%".format(
+            round(population_approval, 2)
+        )
+
+        return response
+
     @list_route(methods=['get'])
     def non_voted_by_user(self, request):
         """
