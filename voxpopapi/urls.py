@@ -30,4 +30,5 @@ urlpatterns = [
     url(r'^api/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/token_auth/', CustomObtainToken.as_view()),
     url(r'^$', schema_view),
+    url(r'^api/oauth/', include('rest_framework_social_oauth2.urls')),
 ]

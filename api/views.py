@@ -300,6 +300,8 @@ class UserViewset(mixins.CreateModelMixin,
 
         try:
             social_information_data = request.data['social_information']
+            if social_information_data.get('id'):
+                del social_information_data['id']
         except KeyError:
             social_information_data = {}
 
@@ -427,7 +429,58 @@ class UserViewset(mixins.CreateModelMixin,
             request,
             pk,
             **kwargs)
+
+        try:
+            social_information_data = request.data['social_information']
+            if social_information_data.get('id'):
+                del social_information_data['id']
+            if social_information_data.get('owner'):
+                del social_information_data['owner']
+
+            SocialInformation.objects.filter(owner=request.user).update(
+                **social_information_data
+            )
+        except KeyError:
+            pass
+
+        social_information = request.user.social_information
+        social_information_serializer = \
+            SocialInformationSerializer(social_information)
+        response.data['social_information'] = \
+            social_information_serializer.data
+
         return response
+
+    @list_route(methods=['get'])
+    def actual_user(self, request):
+        """
+        Returns the actual user.
+        """
+
+        if request.user.is_authenticated:
+            user = dict()
+            user['id'] = request.user.id
+            user['username'] = request.user.username
+            user['first_name'] = request.user.first_name
+            user['last_name'] = request.user.last_name
+
+        try:
+            social_information = request.user.social_information
+        except SocialInformation.DoesNotExist:
+            social_information = SocialInformation.objects.create(
+                owner=request.user
+            )
+            social_information.save()
+
+            try:
+                extended_user = request.user.extended_user
+            except ExtendedUser.DoesNotExist:
+                extended_user = ExtendedUser.objects.create(user=request.user)
+                extended_user.save()
+        else:
+            user = User.objects.none()
+
+        return Response(user)
 
 
 class LoaderViewSet(ViewSet):

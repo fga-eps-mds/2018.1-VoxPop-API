@@ -15,7 +15,7 @@ class UserPermissions(permissions.BasePermission):
         elif (request.user.is_anonymous and request.method == 'POST'):
             return True
 
-        elif 'users' in request.path:
+        elif 'users' in request.path and not 'actual_user' in request.path:
             url_id = request.path.split('/users/')[1][:-1]
             user_id = str(request.user.id)
 
