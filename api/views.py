@@ -595,9 +595,7 @@ class ParliamentaryViewset(mixins.RetrieveModelMixin,
                 compatibility = self.request.user.compatibilities.filter(
                     parliamentary=parliamentary['id']
                 )[0].compatibility
-                parliamentary['compatibility'] = "{}%".format(
-                    round(compatibility, 2)
-                )
+                parliamentary['compatibility'] = round(compatibility, 2)
 
         return response
 
@@ -615,9 +613,7 @@ class ParliamentaryViewset(mixins.RetrieveModelMixin,
             compatibility = self.request.user.compatibilities.filter(
                 parliamentary=response.data['id']
             )[0].compatibility
-            response.data['compatibility'] = "{}%".format(
-                round(compatibility, 2)
-            )
+            response.data['compatibility'] = round(compatibility, 2)
 
         return response
 
@@ -639,23 +635,28 @@ class PropositionViewset(mixins.RetrieveModelMixin,
             parliamentarians_total_votes = ParliamentaryVote.objects.filter(
                 proposition=proposition['id']
             )
-            parliamentarians_approval = parliamentarians_total_votes.filter(
-                option='Y'
-            ).count() / parliamentarians_total_votes.count() * 100
+            try:
+                parliamentarians_approval = \
+                    parliamentarians_total_votes.filter(
+                        option='Y'
+                    ).count() / parliamentarians_total_votes.count() * 100
+            except ZeroDivisionError:
+                parliamentarians_approval = 0
 
             population_total_votes = UserVote.objects.filter(
                 proposition=proposition['id']
             )
-            population_approval = population_total_votes.filter(
-                option='Y'
-            ).count() / population_total_votes.count() * 100
+            try:
+                population_approval = population_total_votes.filter(
+                    option='Y'
+                ).count() / population_total_votes.count() * 100
+            except ZeroDivisionError:
+                population_approval = 0
 
-            proposition['parliamentarians_approval'] = "{}%".format(
+            proposition['parliamentarians_approval'] = \
                 round(parliamentarians_approval, 2)
-            )
-            proposition['population_approval'] = "{}%".format(
+            proposition['population_approval'] = \
                 round(population_approval, 2)
-            )
 
         return response
 
@@ -665,23 +666,27 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         parliamentarians_total_votes = ParliamentaryVote.objects.filter(
             proposition=response.data['id']
         )
-        parliamentarians_approval = parliamentarians_total_votes.filter(
-            option='Y'
-        ).count() / parliamentarians_total_votes.count() * 100
+        try:
+            parliamentarians_approval = parliamentarians_total_votes.filter(
+                option='Y'
+            ).count() / parliamentarians_total_votes.count() * 100
+        except ZeroDivisionError:
+            parliamentarians_approval = 0
 
         population_total_votes = UserVote.objects.filter(
             proposition=response.data['id']
         )
-        population_approval = population_total_votes.filter(
-            option='Y'
-        ).count() / population_total_votes.count() * 100
+        try:
+            population_approval = population_total_votes.filter(
+                option='Y'
+            ).count() / population_total_votes.count() * 100
+        except ZeroDivisionError:
+            population_approval = 0
 
-        response.data['parliamentarians_approval'] = "{}%".format(
+        response.data['parliamentarians_approval'] = \
             round(parliamentarians_approval, 2)
-        )
-        response.data['population_approval'] = "{}%".format(
+        response.data['population_approval'] = \
             round(population_approval, 2)
-        )
 
         return response
 
@@ -722,6 +727,35 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                         proposition_serialized.data,
                         status=status.HTTP_200_OK
                     )
+
+                    parliamentarians_total_votes = \
+                        ParliamentaryVote.objects.filter(
+                            proposition=response.data['id']
+                        )
+                    try:
+                        parliamentarians_approval = \
+                            parliamentarians_total_votes.filter(
+                                option='Y'
+                            ).count() / \
+                            parliamentarians_total_votes.count() * 100
+                    except ZeroDivisionError:
+                        parliamentarians_approval = 0
+
+                    population_total_votes = UserVote.objects.filter(
+                        proposition=response.data['id']
+                    )
+                    try:
+                        population_approval = population_total_votes.filter(
+                            option='Y'
+                        ).count() / population_total_votes.count() * 100
+                    except ZeroDivisionError:
+                        population_approval = 0
+
+                    response.data['parliamentarians_approval'] = \
+                        round(parliamentarians_approval, 2)
+                    response.data['population_approval'] = \
+                        round(population_approval, 2)
+
                     break
 
         except AttributeError:
@@ -756,6 +790,36 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
+
+            for proposition in serializer.data:
+
+                parliamentarians_total_votes = \
+                    ParliamentaryVote.objects.filter(
+                        proposition=proposition['id']
+                    )
+                try:
+                    parliamentarians_approval = \
+                        parliamentarians_total_votes.filter(
+                            option='Y'
+                        ).count() / parliamentarians_total_votes.count() * 100
+                except ZeroDivisionError:
+                    parliamentarians_approval = 0
+
+                population_total_votes = UserVote.objects.filter(
+                    proposition=proposition['id']
+                )
+                try:
+                    population_approval = population_total_votes.filter(
+                        option='Y'
+                    ).count() / population_total_votes.count() * 100
+                except ZeroDivisionError:
+                    population_approval = 0
+
+                proposition['parliamentarians_approval'] = \
+                    round(parliamentarians_approval, 2)
+                proposition['population_approval'] = \
+                    round(population_approval, 2)
+
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
@@ -783,6 +847,34 @@ class UserVoteViewset(viewsets.ModelViewSet):
             proposition = Proposition.objects.get(pk=vote['proposition'])
             proposition_serializer = PropositionSerializer(proposition)
             vote['proposition'] = proposition_serializer.data
+
+            parliamentarians_total_votes = \
+                ParliamentaryVote.objects.filter(
+                    proposition=vote['proposition']['id']
+                )
+            try:
+                parliamentarians_approval = \
+                    parliamentarians_total_votes.filter(
+                        option='Y'
+                    ).count() / \
+                    parliamentarians_total_votes.count() * 100
+            except ZeroDivisionError:
+                parliamentarians_approval = 0
+
+            population_total_votes = UserVote.objects.filter(
+                proposition=vote['proposition']['id']
+            )
+            try:
+                population_approval = population_total_votes.filter(
+                    option='Y'
+                ).count() / population_total_votes.count() * 100
+            except ZeroDivisionError:
+                population_approval = 0
+
+            vote['proposition']['parliamentarians_approval'] = \
+                round(parliamentarians_approval, 2)
+            vote['proposition']['population_approval'] = \
+                round(population_approval, 2)
 
         return response
 
@@ -893,11 +985,23 @@ class UserFollowingViewset(mixins.ListModelMixin,
     def list(self, request):
         response = super(UserFollowingViewset, self).list(request)
 
+        extended_user = ExtendedUser.objects.get(user=request.user)
+        if extended_user.should_update:
+            update_compatibility(self)
+            extended_user.should_update = False
+            extended_user.save()
+
         for following in response.data['results']:
             parliamentary = \
                 Parliamentary.objects.get(pk=following['parliamentary'])
             parliamentary_serializer = ParliamentarySerializer(parliamentary)
             following['parliamentary'] = parliamentary_serializer.data
+
+            compatibility = self.request.user.compatibilities.filter(
+                parliamentary=following['parliamentary']['id']
+            )[0].compatibility
+            following['parliamentary']['compatibility'] = \
+                round(compatibility, 2)
 
         return response
 
@@ -971,6 +1075,12 @@ class UserFollowingViewset(mixins.ListModelMixin,
             }
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
+        extended_user = ExtendedUser.objects.get(user=request.user)
+        if extended_user.should_update:
+            update_compatibility(self)
+            extended_user.should_update = False
+            extended_user.save()
+
         user_following_serializer = UserFollowingSerializer(user_following)
         user_following_dict = dict(user_following_serializer.data)
 
@@ -981,6 +1091,12 @@ class UserFollowingViewset(mixins.ListModelMixin,
         parliamentary_serializer = ParliamentarySerializer(parliamentary)
         user_following_dict['parliamentary'] = \
             parliamentary_serializer.data
+
+        compatibility = self.request.user.compatibilities.filter(
+            parliamentary=user_following_dict['parliamentary']['id']
+        )[0].compatibility
+        user_following_dict['parliamentary']['compatibility'] = \
+            round(compatibility, 2)
 
         return Response(user_following_dict)
 
@@ -1068,9 +1184,8 @@ class StatisticViewset(viewsets.GenericViewSet):
                 compatibility
             ).data
             del compatibility_serialized['user']
-            compatibility_serialized['compatibility'] = "{}%".format(
+            compatibility_serialized['compatibility'] = \
                 round(compatibility_serialized['compatibility'], 2)
-            )
 
             compatibilities_list.append(compatibility_serialized)
 
