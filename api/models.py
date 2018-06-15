@@ -229,7 +229,7 @@ class ExtendedUser(models.Model):
 
 class ContactUs(models.Model):
     topic = models.CharField(max_length=150)
-    email = models.CharField(max_length=100, blank=True)
+    email = models.EmailField(max_length=250, blank=True)
     choice = models.CharField(
         max_length=1,
         choices=CONTACT_CHOICES,
