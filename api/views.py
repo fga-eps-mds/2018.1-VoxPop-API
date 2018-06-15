@@ -1029,10 +1029,7 @@ class StatisticViewset(viewsets.GenericViewSet):
         return Response(compatibilities_list)
 
 
-class ContactUsViewset(mixins.ListModelMixin,
-                       mixins.CreateModelMixin,
-                       mixins.DestroyModelMixin,
-                       mixins.RetrieveModelMixin,
+class ContactUsViewset(mixins.CreateModelMixin,
                        viewsets.GenericViewSet):
     """Description: ContactUsViewset.
     API endpoint that allows contact us
@@ -1041,37 +1038,6 @@ class ContactUsViewset(mixins.ListModelMixin,
     serializer_class = ContactUsSerializer
     class_name = ContactUs
     queryset = ContactUs.objects.all()
-
-    def list(self, request):
-        """
-          API endpoint that allows all 'contact us' to be viewed.
-          ---
-          Response example:
-          ```
-            [
-                "count": 2,
-                "next": null,
-                "previous": null,
-                "results": [
-                    {
-                        "id": 1,
-                        "topic": "title",
-                        "email": "email@email.com",
-                        "choice": "A",
-                        "text": "message"
-                    },
-                    {
-                        "id": 2,
-                        "topic": "another title",
-                        "email": "email@email.com",
-                        "choice": "B",
-                        "text": "another message"
-                    }
-                ]
-            ]
-          ```
-        """
-        return super(ContactUsViewset, self).list(request)
 
     def create(self, request):
         """
@@ -1098,28 +1064,3 @@ class ContactUsViewset(mixins.ListModelMixin,
             ```
         """
         return super(ContactUsViewset, self).create(request)
-
-    def destroy(self, request, pk=None):
-        """
-        API endpoint that allows 'contact us' to be deleted.
-        """
-        response = super(ContactUsViewset, self).destroy(request, pk)
-        return response
-
-    def retrieve(self, request, pk=None):
-        """
-        API endpoint that allows a specific 'contact us' to be viewed.
-        ---
-        Response example:
-        ```
-        {
-            "id": 1,
-            "topic": "title",
-            "email": "email@email.com",
-            "choice": "A",
-            "text": "message"
-        }
-        ```
-        """
-        response = super(ContactUsViewset, self).retrieve(request, pk)
-        return response
