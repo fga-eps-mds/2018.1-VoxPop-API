@@ -15,13 +15,13 @@ from rest_framework.viewsets import ViewSet
 
 from .models import (
     ExtendedUser, Parliamentary, ParliamentaryVote, Proposition,
-    SocialInformation, UserFollowing, UserVote
+    SocialInformation, UserFollowing, UserVote, ContactUs
 )
 from .permissions import SocialInformationPermissions, UserPermissions
 from .serializers import (
     CompatibilitySerializer, ParliamentarySerializer, PropositionSerializer,
     SocialInformationSerializer, UserFollowingSerializer, UserSerializer,
-    UserVoteSerializer
+    UserVoteSerializer, ContactUsSerializer
 )
 from .utils import (
     parliamentarians_filter,
@@ -1196,3 +1196,40 @@ class StatisticViewset(viewsets.GenericViewSet):
             return paginator.get_paginated_response(page)
 
         return Response(compatibilities_list)
+
+
+class ContactUsViewset(mixins.CreateModelMixin,
+                       viewsets.GenericViewSet):
+    """Description: ContactUsViewset.
+    API endpoint that allows contact us
+     to be viewed, created, deleted or edited.
+    """
+    serializer_class = ContactUsSerializer
+    class_name = ContactUs
+    queryset = ContactUs.objects.all()
+
+    def create(self, request):
+        """
+            API endpoint that allows all 'contact us' to be created.
+            ---
+            Body example:
+            ```
+                {
+                    "topic": "title",
+                    "email": "email@email.com",
+                    "choice": "A",
+                    "text": "message"
+                }
+            ```
+            Response example:
+            ```
+                {
+                    "id": 1,
+                    "topic": "title",
+                    "email": "email@email.com",
+                    "choice": "A",
+                    "text": "message"
+                }
+            ```
+        """
+        return super(ContactUsViewset, self).create(request)

@@ -1,10 +1,10 @@
 import datetime
 from django.test import Client
 from django.contrib.auth.models import User
-from .models import SocialInformation
+from .models import SocialInformation, ContactUs
 from django.urls import include, path, reverse
 from rest_framework.test import APIRequestFactory, APITestCase
-from .views import SocialInformationViewset, UserViewset
+from .views import SocialInformationViewset, UserViewset, ContactUsViewset
 from  rest_framework import serializers, status
 from django.utils.translation import ugettext_lazy as _
 # Create your tests here.
