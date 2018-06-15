@@ -15,13 +15,13 @@ from rest_framework.viewsets import ViewSet
 
 from .models import (
     ExtendedUser, Parliamentary, ParliamentaryVote, Proposition,
-    SocialInformation, UserFollowing, UserVote
+    SocialInformation, UserFollowing, UserVote, ContactUs
 )
 from .permissions import SocialInformationPermissions, UserPermissions
 from .serializers import (
     CompatibilitySerializer, ParliamentarySerializer, PropositionSerializer,
     SocialInformationSerializer, UserFollowingSerializer, UserSerializer,
-    UserVoteSerializer
+    UserVoteSerializer, ContactUsSerializer
 )
 from .utils import (
     parliamentarians_filter,
@@ -1027,3 +1027,47 @@ class StatisticViewset(viewsets.GenericViewSet):
             return paginator.get_paginated_response(page)
 
         return Response(compatibilities_list)
+
+
+class ContactUsViewset(mixins.ListModelMixin,
+                           mixins.CreateModelMixin,
+                           mixins.DestroyModelMixin,
+                           mixins.RetrieveModelMixin,
+                           viewsets.GenericViewSet):
+    """Description: ContactUsViewset.
+    API endpoint that allows contact us
+     to be viewed, created, deleted or edited.
+    """
+    serializer_class = ContactUsSerializer
+    class_name = ContactUs
+    queryset = ContactUs.objects.all()
+
+    def list(self, request):
+        
+        return super(ContactUsViewset, self).list(request)
+
+    def create(self, request):
+        
+        return super(ContactUsViewset, self).create(request)
+    
+    def destroy(self, request, pk=None):
+        """
+        API endpoint that allows 'contact us' to be deleted.
+        """
+        response = super(ContactUsViewset, self).destroy(request, pk)
+        return response
+
+    def retrieve(self, request, pk=None):
+        """
+        API endpoint that allows a specific 'contact us' to be viewed.
+        ---
+        Response example:
+        ```
+        {
+          
+        }
+        ```
+        """
+        response = super(ContactUsViewset, self).retrieve(request, pk)
+        return response
+    

@@ -1,7 +1,7 @@
 from api.views import (
     CustomObtainToken, LoaderViewSet, ParliamentaryViewset, PropositionViewset,
     SocialInformationViewset, StatisticViewset, UserFollowingViewset,
-    UserViewset, UserVoteViewset
+    UserViewset, UserVoteViewset, ContactUsViewset
 )
 
 from django.conf.urls import include, url
@@ -14,6 +14,7 @@ from rest_framework_swagger.views import get_swagger_view
 schema_view = get_swagger_view(title='VoxPop API')
 
 router = routers.DefaultRouter()
+router.register(r'contact_us', ContactUsViewset)
 router.register(r'users', UserViewset)
 router.register(r'social_informations', SocialInformationViewset)
 router.register(r'loader', LoaderViewSet, 'loader')
