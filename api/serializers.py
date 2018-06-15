@@ -1,6 +1,6 @@
 from .models import (
     Compatibility, ExtendedUser, Parliamentary, ParliamentaryVote, Proposition,
-    SocialInformation, UserFollowing, UserVote
+    SocialInformation, UserFollowing, UserVote, ContactUs
 )
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -148,4 +148,14 @@ class CompatibilitySerializer(serializers.ModelSerializer):
             'valid_votes',
             'matching_votes',
             'compatibility'
+        ]
+
+class ContactUsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactUs
+        fields = [
+            'id',
+            'topic',
+            'choice',
+            'text'
         ]
