@@ -73,6 +73,13 @@ INCOME_CHOICES = (
     ('6', '25000.00+'),
 )
 
+CONTACT_CHOICES = (
+    ('A', 'Dúvida'),
+    ('B', 'Sugestão'),
+    ('C', 'Reclamação'),
+    ('D', 'Outro'),
+)
+
 
 class SocialInformation(models.Model):
 
@@ -210,3 +217,8 @@ class ExtendedUser(models.Model):
         related_name='extended_user'
     )
     should_update = models.BooleanField(default=True)
+
+class ContactUs(models.Model):
+    topic = models.CharField(max_length=150)
+    choice = models.CharField(max_length=150, choices=CONTACT_CHOICES, default='A')
+    text = models.CharField(max_length=500)
