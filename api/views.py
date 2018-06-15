@@ -1043,9 +1043,56 @@ class ContactUsViewset(mixins.ListModelMixin,
     queryset = ContactUs.objects.all()
 
     def list(self, request):
+        """
+          API endpoint that allows all 'contact us' to be viewed.
+          ---
+          Response example:
+          ```
+            [
+                "count": 2,
+                "next": null,
+                "previous": null,
+                "results": [
+                    {
+                        "id": 1,
+                        "topic": "title",
+                        "choice": "A",
+                        "text": "message"
+                    },
+                    {
+                        "id": 2,
+                        "topic": "another title",
+                        "choice": "B",
+                        "text": "another message"
+                    }
+                ]
+            ]
+          ```
+        """
         return super(ContactUsViewset, self).list(request)
 
     def create(self, request):
+        """
+            API endpoint that allows all 'contact us' to be created.
+            ---
+            Body example:
+            ```
+                {
+                    "topic": "title",
+                    "choice": "A",
+                    "text": "message"
+                }
+            ```
+            Response example:
+            ```
+                {
+                    "id": 1,
+                    "topic": "title",
+                    "choice": "A",
+                    "text": "message"
+                }
+            ```
+        """
         return super(ContactUsViewset, self).create(request)
 
     def destroy(self, request, pk=None):
@@ -1062,7 +1109,10 @@ class ContactUsViewset(mixins.ListModelMixin,
         Response example:
         ```
         {
-
+            "id": 1,
+            "topic": "title",
+            "choice": "A",
+            "text": "message"
         }
         ```
         """
