@@ -1,10 +1,10 @@
 import datetime
 from django.test import Client
 from django.contrib.auth.models import User
-from .models import SocialInformation
+from .models import SocialInformation, ContactUs
 from django.urls import include, path, reverse
 from rest_framework.test import APIRequestFactory, APITestCase
-from .views import SocialInformationViewset, UserViewset
+from .views import SocialInformationViewset, UserViewset, ContactUsViewset
 from  rest_framework import serializers, status
 from django.utils.translation import ugettext_lazy as _
 # Create your tests here.
@@ -263,3 +263,41 @@ class SocialInformationTests(APITestCase):
                 "Date has wrong format. Use one of these formats instead: YYYY[-MM[-DD]]."
             ]}
         )
+
+class ContactUsTests(APITestCase):
+
+    def setUp(self):
+        """
+        This method will run before any test.
+        """
+        self.contactUs = ContactUs.objects.create(
+            topic='teste',
+            choice='A',
+            text='teste'
+        )
+        self.url = '/api/contact_us/'
+
+    def tearDown(self):
+        """
+        This method will run after any test.
+        """
+        self.contactUs.delete()
+
+    def test_create_contact_us(self):
+        """
+        Ensure we can create a 'contact us' object.
+        """
+        response = self.client.get(self.url + str(self.contactUs.pk) + '/')
+        self.assertEqual(response.status_code,  status.HTTP_200_OK)
+
+    def test_invalid_create_contact_us(self):
+        """
+        Ensure we can't create a invalid user object.
+        """
+        data = {
+            'topic':'updated',
+            'choice':'teste',
+            'text':'teste'
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

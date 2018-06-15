@@ -220,5 +220,5 @@ class ExtendedUser(models.Model):
 
 class ContactUs(models.Model):
     topic = models.CharField(max_length=150)
-    choice = models.CharField(max_length=150, choices=CONTACT_CHOICES, default='A')
+    choice = models.CharField(max_length=1, choices=CONTACT_CHOICES, default='A')
     text = models.CharField(max_length=500)
