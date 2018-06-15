@@ -150,6 +150,7 @@ class CompatibilitySerializer(serializers.ModelSerializer):
             'compatibility'
         ]
 
+
 class ContactUsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactUs

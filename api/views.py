@@ -1030,10 +1030,10 @@ class StatisticViewset(viewsets.GenericViewSet):
 
 
 class ContactUsViewset(mixins.ListModelMixin,
-                           mixins.CreateModelMixin,
-                           mixins.DestroyModelMixin,
-                           mixins.RetrieveModelMixin,
-                           viewsets.GenericViewSet):
+                       mixins.CreateModelMixin,
+                       mixins.DestroyModelMixin,
+                       mixins.RetrieveModelMixin,
+                       viewsets.GenericViewSet):
     """Description: ContactUsViewset.
     API endpoint that allows contact us
      to be viewed, created, deleted or edited.
@@ -1043,13 +1043,11 @@ class ContactUsViewset(mixins.ListModelMixin,
     queryset = ContactUs.objects.all()
 
     def list(self, request):
-        
         return super(ContactUsViewset, self).list(request)
 
     def create(self, request):
-        
         return super(ContactUsViewset, self).create(request)
-    
+
     def destroy(self, request, pk=None):
         """
         API endpoint that allows 'contact us' to be deleted.
@@ -1064,10 +1062,9 @@ class ContactUsViewset(mixins.ListModelMixin,
         Response example:
         ```
         {
-          
+
         }
         ```
         """
         response = super(ContactUsViewset, self).retrieve(request, pk)
         return response
-    
