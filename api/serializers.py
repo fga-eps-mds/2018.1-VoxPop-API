@@ -157,6 +157,7 @@ class ContactUsSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'topic',
+            'email',
             'choice',
             'text'
         ]

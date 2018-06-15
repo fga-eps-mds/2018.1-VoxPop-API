@@ -272,6 +272,7 @@ class ContactUsTests(APITestCase):
         """
         self.contactUs = ContactUs.objects.create(
             topic='teste',
+            email='email@email.com',
             choice='A',
             text='teste'
         )
@@ -296,6 +297,7 @@ class ContactUsTests(APITestCase):
         """
         data = {
             'topic':'updated',
+            'email':'just@testing.com',
             'choice':'teste',
             'text':'teste'
         }

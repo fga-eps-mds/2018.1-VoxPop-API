@@ -1056,12 +1056,14 @@ class ContactUsViewset(mixins.ListModelMixin,
                     {
                         "id": 1,
                         "topic": "title",
+                        "email": "email@email.com",
                         "choice": "A",
                         "text": "message"
                     },
                     {
                         "id": 2,
                         "topic": "another title",
+                        "email": "email@email.com",
                         "choice": "B",
                         "text": "another message"
                     }
@@ -1079,6 +1081,7 @@ class ContactUsViewset(mixins.ListModelMixin,
             ```
                 {
                     "topic": "title",
+                    "email": "email@email.com",
                     "choice": "A",
                     "text": "message"
                 }
@@ -1088,6 +1091,7 @@ class ContactUsViewset(mixins.ListModelMixin,
                 {
                     "id": 1,
                     "topic": "title",
+                    "email": "email@email.com",
                     "choice": "A",
                     "text": "message"
                 }
@@ -1111,6 +1115,7 @@ class ContactUsViewset(mixins.ListModelMixin,
         {
             "id": 1,
             "topic": "title",
+            "email": "email@email.com",
             "choice": "A",
             "text": "message"
         }

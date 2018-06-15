@@ -88,9 +88,17 @@ class SocialInformation(models.Model):
         related_name='social_information',
         on_delete=models.CASCADE
     )
-    federal_unit = models.CharField(max_length=150, choices=UF_CHOICES, default='N')
+    federal_unit = models.CharField(
+        max_length=150,
+        choices=UF_CHOICES,
+        default='N'
+    )
     city = models.CharField(max_length=150, blank=True)
-    income = models.CharField(max_length=100, choices=INCOME_CHOICES, default='-1')
+    income = models.CharField(
+        max_length=100,
+        choices=INCOME_CHOICES,
+        default='-1'
+    )
     education = models.CharField(
         max_length=150, choices=EDUCATION_CHOICES, default='N'
     )
@@ -218,7 +226,13 @@ class ExtendedUser(models.Model):
     )
     should_update = models.BooleanField(default=True)
 
+
 class ContactUs(models.Model):
     topic = models.CharField(max_length=150)
-    choice = models.CharField(max_length=1, choices=CONTACT_CHOICES, default='A')
+    email = models.CharField(max_length=100, blank=True)
+    choice = models.CharField(
+        max_length=1,
+        choices=CONTACT_CHOICES,
+        default='A'
+    )
     text = models.CharField(max_length=500)
