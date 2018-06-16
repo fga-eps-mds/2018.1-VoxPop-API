@@ -40,18 +40,19 @@ class PropositionAdmin(admin.ModelAdmin):
         'year',
         'abstract',
         'processing',
-        'situation'
+        'situation',
+        'last_update'
     ]
 
 
 class SocialInformationAdmin(admin.ModelAdmin):
     list_display = [
         'owner',
-        'federal_unit',
-        'city',
+        'region',
         'income',
         'education',
-        'job',
+        'race',
+        'gender',
         'birth_date',
     ]
 

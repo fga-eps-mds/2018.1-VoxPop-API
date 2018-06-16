@@ -13,11 +13,11 @@ class SocialInformationSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'owner',
-            'federal_unit',
-            'city',
+            'region',
             'income',
             'education',
-            'job',
+            'race',
+            'gender',
             'birth_date',
         ]
 
@@ -100,7 +100,8 @@ class PropositionSerializer(serializers.ModelSerializer):
             'abstract',
             'processing',
             'situation',
-            'url_full'
+            'url_full',
+            'last_update'
         ]
 
 

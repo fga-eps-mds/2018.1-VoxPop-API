@@ -28,6 +28,9 @@ class UserTests(APITestCase):
             email='teste@teste.com',
             password='teste'
         )
+        self.social_information = SocialInformation.objects.create(
+            owner=self.user
+        )
         self.url = '/api/users/'
         # self.client.force_login(self.user)
         self.client.force_authenticate(self.superuser)
@@ -37,6 +40,7 @@ class UserTests(APITestCase):
         This method will run after any test.
         """
         self.user.delete()
+        self.social_information.delete()
 
     def test_create_user(self):
         """
@@ -63,6 +67,7 @@ class UserTests(APITestCase):
         """
         Ensure we can create a new user object.
         """
+        self.client.force_authenticate(self.user)
         self.assertEqual(self.user.username, 'teste')
         data = {
             'username':'teste',
@@ -102,6 +107,7 @@ class UserTests(APITestCase):
         """
         Ensure we can partially update a user object.
         """
+        self.client.force_authenticate(self.user)
         self.assertEqual(self.user.email, 'teste@teste.com')
         data = {
             'email':'silverson@teste.com',
@@ -171,12 +177,12 @@ class SocialInformationTests(APITestCase):
         """
         data = {
             "owner": self.user,
-            "federal_unit": "AC",
-            "city": "Rio Branco",
-            "income": "2",
-            "education": "EFC",
-            "job": "Dono de Casa",
-            "birth_date": "2018-01-01"
+            "region": "",
+            "income": "",
+            "education": "",
+            "race": "",
+            "gender": "",
+            "birth_date": ""
         }
         response = None
 
@@ -191,34 +197,34 @@ class SocialInformationTests(APITestCase):
         """
         Ensure we can update a new social information object.
         """
-        self.assertEqual(self.social.job, '')
+        self.assertEqual(self.social.region, None)
         data = {
             "owner": self.user.pk,
-            "federal_unit": "AC",
-            "city": "Rio Branco",
-            "income": "2",
-            "education": "EFC",
-            "job": "Dono de Prédio",
-            "birth_date": "2018-04-07"
+            "region": "N",
+            "income": "",
+            "education": "",
+            "race": "",
+            "gender": "",
+            "birth_date": ""
         }
         response = self.client.put(self.url + str(self.social.pk) + '/', data)
 
         new_social = SocialInformation.objects.get(pk=self.social.pk)
         self.assertEqual(response.status_code,  status.HTTP_200_OK)
-        self.assertEqual(new_social.job, 'Dono de Prédio')
+        self.assertEqual(new_social.region, 'N')
 
     def test_invalid_update_social(self):
         """
         Ensure we can't update a social object with invalid fields.
         """
-        self.assertEqual(self.social.birth_date, datetime.date.today())
+        self.assertEqual(self.social.birth_date, None)
         data = {
             "owner": self.user.pk,
-            "federal_unit": "AC",
-            "city": "Rio Branco",
-            "income": "2",
-            "education": "EFC",
-            "job": "Dono de Casa",
+            "region": "",
+            "income": "",
+            "education": "",
+            "race": "",
+            "gender": "",
             "birth_date": "20180-43-213"
         }
         response = self.client.put(self.url + str(self.social.pk) + '/', data)
@@ -236,21 +242,21 @@ class SocialInformationTests(APITestCase):
         """
         Ensure we can partially update a social object.
         """
-        self.assertEqual(self.social.job, '')
+        self.assertEqual(self.social.region, None)
         data = {
-            'job':'Dono de Condomínio',
+            'region': 'N',
         }
         response = self.client.patch(self.url + str(self.social.pk) + '/', data)
         new_social = SocialInformation.objects.get(pk=self.social.pk)
         self.assertEqual(response.status_code,  status.HTTP_200_OK)
-        self.assertEqual(new_social.job, 'Dono de Condomínio')
+        self.assertEqual(new_social.region, 'N')
 
     def test_invalid_partial_update_social(self):
         """
         Ensure we can't partially update invalid information on a valid social
         object.
         """
-        self.assertEqual(self.social.job, '')
+        self.assertEqual(self.social.region, None)
         data = {
             'birth_date': '20180-56-89',
         }
