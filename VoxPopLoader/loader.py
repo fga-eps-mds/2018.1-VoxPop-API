@@ -91,7 +91,7 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
             base=self.base_url
         )
 
-        self.api_base_url = "api:8000"
+        self.api_base_url = "localhost:8000"
         self.propositions_url = \
             "http://{base}/api/propositions/?limit=10000".format(
                 base=self.api_base_url
@@ -412,7 +412,9 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
                     # Situação
                     'situation': proposition_result[sp]['descricaoSituacao'],
                     # URL da proposição na íntegra
-                    'url_full': proposition_result[sp]['url']
+                    'url_full': proposition_result[sp]['url'],
+                    # Última atualização da proposição
+                    'last_update': proposition_result[sp]['dataHora']
                 }
 
                 requests.post(
