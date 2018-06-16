@@ -105,6 +105,13 @@ class SocialInformation(models.Model):
     job = models.CharField(max_length=100, blank=True)
     birth_date = models.DateField(default=datetime.date.today)
 
+    def __str__(self):
+        return '{owner}'.format(owner=self.owner)
+
+    class Meta:
+        verbose_name = "Social Information"
+        verbose_name_plural = "Social Informations"
+
 
 class Parliamentary(models.Model):
 
@@ -123,6 +130,10 @@ class Parliamentary(models.Model):
     def __str__(self):
         return '{name}'.format(name=self.name)
 
+    class Meta:
+        verbose_name = "Parliamentary"
+        verbose_name_plural = "Parliamentarians"
+
 
 class Proposition(models.Model):
 
@@ -140,6 +151,10 @@ class Proposition(models.Model):
         return 'Proposition {native_id}'.format(
             native_id=self.native_id
         )
+
+    class Meta:
+        verbose_name = "Proposition"
+        verbose_name_plural = "Propositions"
 
 
 class UserVote(models.Model):
@@ -162,6 +177,8 @@ class UserVote(models.Model):
 
     class Meta:
         unique_together = ('proposition', 'user')
+        verbose_name = "User Vote"
+        verbose_name_plural = "User Votes"
 
 
 class ParliamentaryVote(models.Model):
@@ -184,6 +201,8 @@ class ParliamentaryVote(models.Model):
 
     class Meta:
         unique_together = ('proposition', 'parliamentary')
+        verbose_name = "Parliamentary Vote"
+        verbose_name_plural = "Parliamentary Votes"
 
 
 class UserFollowing(models.Model):
@@ -198,6 +217,10 @@ class UserFollowing(models.Model):
         on_delete=models.DO_NOTHING,
         related_name='followers'
     )
+
+    class Meta:
+        verbose_name = "User Following"
+        verbose_name_plural = "User Following"
 
 
 class Compatibility(models.Model):
@@ -216,6 +239,10 @@ class Compatibility(models.Model):
     matching_votes = models.IntegerField(blank=True)
     compatibility = models.FloatField(blank=True)
 
+    class Meta:
+        verbose_name = "Compatibility"
+        verbose_name_plural = "Compatibilities"
+
 
 class ExtendedUser(models.Model):
 
@@ -225,6 +252,10 @@ class ExtendedUser(models.Model):
         related_name='extended_user'
     )
     should_update = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Extended User"
+        verbose_name_plural = "Extended Users"
 
 
 class ContactUs(models.Model):
@@ -236,3 +267,7 @@ class ContactUs(models.Model):
         default='A'
     )
     text = models.CharField(max_length=500)
+
+    class Meta:
+        verbose_name = "Contact Us"
+        verbose_name_plural = "Contact Us"
