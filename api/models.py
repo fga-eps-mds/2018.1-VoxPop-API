@@ -5,48 +5,47 @@ from django.db import models
 
 
 # Create your models here.
-UF_CHOICES = (
-    ('N', 'Null'),
-    ('AC', 'Acre'),
-    ('AL', 'Alagoas'),
-    ('AP', 'Amapá'),
-    ('BA', 'Bahia'),
-    ('CE', 'Ceará'),
-    ('DF', 'Distrito Federal'),
-    ('ES', 'Espírito Santo'),
-    ('GO', 'Goiás'),
-    ('MA', 'Maranão'),
-    ('MG', 'Minas Gerais'),
-    ('MS', 'Mato Grosso do Sul'),
-    ('MT', 'Mato Grosso'),
-    ('PA', 'Pará'),
-    ('PB', 'Paraíba'),
-    ('PE', 'Pernanbuco'),
-    ('PI', 'Piauí'),
-    ('PR', 'Paraná'),
-    ('RJ', 'Rio de Janeiro'),
-    ('RN', 'Rio Grande do Norte'),
-    ('RO', 'Rondônia'),
-    ('RR', 'Roraima'),
-    ('RS', 'Rio Grande do Sul'),
-    ('SC', 'Santa Catarina'),
-    ('SE', 'Sergipe'),
-    ('SP', 'São Paulo'),
-    ('TO', 'Tocantins')
+REGION_CHOICES = (
+    (None, 'Null'),
+    ('N', 'Norte'),
+    ('NE', 'Nordeste'),
+    ('CO', 'Centro-Oeste'),
+    ('SE', 'Sudeste'),
+    ('S', 'Sul')
+)
+
+INCOME_CHOICES = (
+    (None, 'Null'),
+    ('E', '0.00-1874.00'),
+    ('D', '1874.01-3748.00'),
+    ('C', '3748.01-9370.00'),
+    ('B', '9370.01-18740.00'),
+    ('A', '18740.01+')
 )
 
 EDUCATION_CHOICES = (
-    ('N', 'Null'),
-    ('EFC', 'Ensino Fundamental Completo'),
-    ('EFI', 'Ensino Fundamental Incompleto'),
-    ('EMC', 'Ensino Médio Completo'),
-    ('EMI', 'Ensino Médio Incompleto'),
-    ('ESC', 'Ensino Superior Completo'),
-    ('ESI', 'Ensino Superior Incompleto'),
-    ('PG', 'Pós-Graduação'),
-    ('ME', 'Mestrado'),
-    ('DO', 'Doutorado'),
-    ('PD', 'Pós-Doutorado')
+    (None, 'Null'),
+    ('SE', 'Sem Escolaridade'),
+    ('EF', 'Ensino Fundamental'),
+    ('EM', 'Ensino Médio'),
+    ('ES', 'Ensino Superior'),
+    ('PG', 'Pós-Graduação')
+)
+
+RACE_CHOICES = (
+    (None, 'Null'),
+    ('B', 'Branca'),
+    ('PR', 'Preta'),
+    ('A', 'Amarela'),
+    ('PA', 'Parda'),
+    ('I', 'Indígena')
+)
+
+GENDER_CHOICES = (
+    (None, 'Null'),
+    ('M', 'Masculino'),
+    ('F', 'Feminino'),
+    ('O', 'Outros')
 )
 
 VOTE_CHOICES = (
@@ -55,22 +54,6 @@ VOTE_CHOICES = (
     ('A', 'Abstention'),
     ('O', 'Obstruction'),
     ('M', 'Missing'),
-)
-
-GENDER_CHOICES = (
-    ('M', 'Male'),
-    ('F', 'Female'),
-)
-
-INCOME_CHOICES = (
-    ('-1', 'Null'),
-    ('0', '0.00-1000.00'),
-    ('1', '1000.01-3000.00'),
-    ('2', '3000.01-6000.00'),
-    ('3', '6000.01-9000.00'),
-    ('4', '9000.01-15000.00'),
-    ('5', '15000.01-25000.00'),
-    ('6', '25000.00+'),
 )
 
 CONTACT_CHOICES = (
@@ -88,22 +71,47 @@ class SocialInformation(models.Model):
         related_name='social_information',
         on_delete=models.CASCADE
     )
-    federal_unit = models.CharField(
-        max_length=150,
-        choices=UF_CHOICES,
-        default='N'
+    region = models.CharField(
+        max_length=2,
+        choices=REGION_CHOICES,
+        default=None,
+        null=True
     )
-    city = models.CharField(max_length=150, blank=True)
     income = models.CharField(
-        max_length=100,
+        max_length=20,
         choices=INCOME_CHOICES,
-        default='-1'
+        default=None,
+        null=True
     )
     education = models.CharField(
-        max_length=150, choices=EDUCATION_CHOICES, default='N'
+        max_length=2,
+        choices=EDUCATION_CHOICES,
+        default=None,
+        null=True
     )
-    job = models.CharField(max_length=100, blank=True)
-    birth_date = models.DateField(default=datetime.date.today)
+    race = models.CharField(
+        max_length=2,
+        choices=RACE_CHOICES,
+        default=None,
+        null=True
+    )
+    gender = models.CharField(
+        max_length=1,
+        choices=GENDER_CHOICES,
+        default=None,
+        null=True
+    )
+    birth_date = models.DateField(
+        default=None,
+        null=True
+    )
+
+    def __str__(self):
+        return '{owner}'.format(owner=self.owner)
+
+    class Meta:
+        verbose_name = "Social Information"
+        verbose_name_plural = "Social Informations"
 
 
 class Parliamentary(models.Model):
@@ -123,6 +131,10 @@ class Parliamentary(models.Model):
     def __str__(self):
         return '{name}'.format(name=self.name)
 
+    class Meta:
+        verbose_name = "Parliamentary"
+        verbose_name_plural = "Parliamentarians"
+
 
 class Proposition(models.Model):
 
@@ -135,11 +147,16 @@ class Proposition(models.Model):
     processing = models.CharField(max_length=100, blank=True)
     situation = models.CharField(max_length=100, blank=True)
     url_full = models.URLField(blank=True)
+    last_update = models.DateTimeField(blank=True)
 
     def __str__(self):
         return 'Proposition {native_id}'.format(
             native_id=self.native_id
         )
+
+    class Meta:
+        verbose_name = "Proposition"
+        verbose_name_plural = "Propositions"
 
 
 class UserVote(models.Model):
@@ -162,6 +179,8 @@ class UserVote(models.Model):
 
     class Meta:
         unique_together = ('proposition', 'user')
+        verbose_name = "User Vote"
+        verbose_name_plural = "User Votes"
 
 
 class ParliamentaryVote(models.Model):
@@ -184,6 +203,8 @@ class ParliamentaryVote(models.Model):
 
     class Meta:
         unique_together = ('proposition', 'parliamentary')
+        verbose_name = "Parliamentary Vote"
+        verbose_name_plural = "Parliamentary Votes"
 
 
 class UserFollowing(models.Model):
@@ -198,6 +219,10 @@ class UserFollowing(models.Model):
         on_delete=models.DO_NOTHING,
         related_name='followers'
     )
+
+    class Meta:
+        verbose_name = "User Following"
+        verbose_name_plural = "User Following"
 
 
 class Compatibility(models.Model):
@@ -216,6 +241,10 @@ class Compatibility(models.Model):
     matching_votes = models.IntegerField(blank=True)
     compatibility = models.FloatField(blank=True)
 
+    class Meta:
+        verbose_name = "Compatibility"
+        verbose_name_plural = "Compatibilities"
+
 
 class ExtendedUser(models.Model):
 
@@ -225,6 +254,10 @@ class ExtendedUser(models.Model):
         related_name='extended_user'
     )
     should_update = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Extended User"
+        verbose_name_plural = "Extended Users"
 
 
 class ContactUs(models.Model):
@@ -236,3 +269,7 @@ class ContactUs(models.Model):
         default='A'
     )
     text = models.CharField(max_length=500)
+
+    class Meta:
+        verbose_name = "Contact Us"
+        verbose_name_plural = "Contact Us"

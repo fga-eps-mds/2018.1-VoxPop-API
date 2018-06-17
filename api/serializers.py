@@ -13,11 +13,11 @@ class SocialInformationSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'owner',
-            'federal_unit',
-            'city',
+            'region',
             'income',
             'education',
-            'job',
+            'race',
+            'gender',
             'birth_date',
         ]
 
@@ -55,14 +55,18 @@ class UserSerializer(serializers.ModelSerializer):
         return voxpopuser
 
     def update(self, instance, validated_data):
-        updatedUser = vars(instance)
-        del(updatedUser['_state'])
+
+        updated_user = vars(instance)
+        del updated_user['_state']
         for field, value in validated_data.items():
-            updatedUser[field] = value
-        updated = User(**updatedUser)
+            updated_user[field] = value
+
+        updated = User(**updated_user)
         if 'password' in validated_data:
             updated.set_password(validated_data['password'])
+
         updated.save()
+
         return updated
 
 
@@ -96,7 +100,8 @@ class PropositionSerializer(serializers.ModelSerializer):
             'abstract',
             'processing',
             'situation',
-            'url_full'
+            'url_full',
+            'last_update'
         ]
 
 

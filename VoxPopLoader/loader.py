@@ -412,7 +412,9 @@ class VoxPopLoaderTCPHandler(socketserver.BaseRequestHandler):
                     # Situação
                     'situation': proposition_result[sp]['descricaoSituacao'],
                     # URL da proposição na íntegra
-                    'url_full': proposition_result[sp]['url']
+                    'url_full': proposition_result[sp]['url'],
+                    # Última atualização da proposição
+                    'last_update': proposition_result[sp]['dataHora']
                 }
 
                 requests.post(

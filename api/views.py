@@ -1,10 +1,12 @@
 import json
 from base64 import b64encode
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.db.models import Count, Q
+from django.utils import timezone
 
 from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -300,6 +302,8 @@ class UserViewset(mixins.CreateModelMixin,
 
         try:
             social_information_data = request.data['social_information']
+            if social_information_data.get('id'):
+                del social_information_data['id']
         except KeyError:
             social_information_data = {}
 
@@ -427,7 +431,58 @@ class UserViewset(mixins.CreateModelMixin,
             request,
             pk,
             **kwargs)
+
+        try:
+            social_information_data = request.data['social_information']
+            if social_information_data.get('id'):
+                del social_information_data['id']
+            if social_information_data.get('owner'):
+                del social_information_data['owner']
+
+            SocialInformation.objects.filter(owner=request.user).update(
+                **social_information_data
+            )
+        except KeyError:
+            pass
+
+        social_information = request.user.social_information
+        social_information_serializer = \
+            SocialInformationSerializer(social_information)
+        response.data['social_information'] = \
+            social_information_serializer.data
+
         return response
+
+    @list_route(methods=['get'])
+    def actual_user(self, request):
+        """
+        Returns the actual user.
+        """
+
+        if request.user.is_authenticated:
+            user = dict()
+            user['id'] = request.user.id
+            user['username'] = request.user.username
+            user['first_name'] = request.user.first_name
+            user['last_name'] = request.user.last_name
+
+            try:
+                social_information = request.user.social_information
+            except SocialInformation.DoesNotExist:
+                social_information = SocialInformation.objects.create(
+                    owner=request.user
+                )
+                social_information.save()
+
+            try:
+                extended_user = request.user.extended_user
+            except ExtendedUser.DoesNotExist:
+                extended_user = ExtendedUser.objects.create(user=request.user)
+                extended_user.save()
+        else:
+            user = User.objects.none()
+
+        return Response(user)
 
 
 class LoaderViewSet(ViewSet):
@@ -490,7 +545,7 @@ class LoaderViewSet(ViewSet):
         if request.query_params.get('key') == \
                 LoaderViewSet.__get_credentials():
 
-            propositions = Proposition.objects.all().order_by('-year')
+            propositions = Proposition.objects.all().order_by('-last_update')
             propositions_list = []
 
             for proposition in propositions:
@@ -518,6 +573,12 @@ class LoaderViewSet(ViewSet):
         if request.query_params.get('key') == \
                 LoaderViewSet.__get_credentials():
             proposition_dict = request.data.dict()
+
+            proposition_dict['last_update'] = datetime.strptime(
+                proposition_dict['last_update'] + '-0300',
+                '%Y-%m-%dT%H:%M%z'
+            )
+
             Proposition.objects.create(**proposition_dict)
 
             response = Response({"status": "OK"}, status=status.HTTP_200_OK)
@@ -624,7 +685,7 @@ class PropositionViewset(mixins.RetrieveModelMixin,
     serializer_class = PropositionSerializer
 
     def get_queryset(self):
-        queryset = Proposition.objects.all().order_by('-year')
+        queryset = Proposition.objects.all().order_by('-last_update')
         return propositions_filter(self, queryset)
 
     def list(self, request):
@@ -713,7 +774,7 @@ class PropositionViewset(mixins.RetrieveModelMixin,
 
             all_propositions = Proposition.objects.filter(
                 id__in=proposition_voted_ids
-            ).order_by('-year')
+            ).order_by('-last_update')
 
             response = Response(
                 {'status': 'No Content'},
@@ -755,6 +816,12 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                         round(parliamentarians_approval, 2)
                     response.data['population_approval'] = \
                         round(population_approval, 2)
+                    response.data['days_ago'] = (
+                        timezone.now() - datetime.strptime(
+                            response.data['last_update'] + '-0300',
+                            '%Y-%m-%dT%H:%M:%SZ%z'
+                        )
+                    ).days
 
                     break
 
@@ -782,7 +849,7 @@ class PropositionViewset(mixins.RetrieveModelMixin,
 
         queryset = Proposition.objects.filter(
             id__in=proposition_voted_ids
-        ).order_by('-year')
+        ).order_by('-last_update')
 
         # serializer = PropositionSerializer(queryset, many=True)
         # return Response(serializer.data)
@@ -819,6 +886,10 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                     round(parliamentarians_approval, 2)
                 proposition['population_approval'] = \
                     round(population_approval, 2)
+                proposition['days_ago'] = (timezone.now() - datetime.strptime(
+                    proposition['last_update'] + '-0300',
+                    '%Y-%m-%dT%H:%M:%SZ%z'
+                )).days
 
             return self.get_paginated_response(serializer.data)
 
@@ -875,6 +946,12 @@ class UserVoteViewset(viewsets.ModelViewSet):
                 round(parliamentarians_approval, 2)
             vote['proposition']['population_approval'] = \
                 round(population_approval, 2)
+            vote['proposition']['days_ago'] = (
+                timezone.now() - datetime.strptime(
+                    vote['proposition']['last_update'] + '-0300',
+                    '%Y-%m-%dT%H:%M:%SZ%z'
+                )
+            ).days
 
         return response
 
