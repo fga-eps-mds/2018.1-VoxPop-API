@@ -72,7 +72,7 @@ class SocialInformation(models.Model):
         on_delete=models.CASCADE
     )
     region = models.CharField(
-        max_length=2,
+        max_length=10,
         choices=REGION_CHOICES,
         default=None,
         null=True
@@ -84,19 +84,19 @@ class SocialInformation(models.Model):
         null=True
     )
     education = models.CharField(
-        max_length=2,
+        max_length=10,
         choices=EDUCATION_CHOICES,
         default=None,
         null=True
     )
     race = models.CharField(
-        max_length=2,
+        max_length=10,
         choices=RACE_CHOICES,
         default=None,
         null=True
     )
     gender = models.CharField(
-        max_length=1,
+        max_length=10,
         choices=GENDER_CHOICES,
         default=None,
         null=True
