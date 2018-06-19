@@ -676,6 +676,52 @@ class ParliamentaryViewset(mixins.RetrieveModelMixin,
             )[0].compatibility
             response.data['compatibility'] = round(compatibility, 2)
 
+            response.data['voted_by_both'] = list()
+            voted_by_both = Proposition.objects.filter(
+                user_votes__user=request.user,
+                parliamentary_votes__parliamentary=response.data['id']
+            )
+            for proposition in voted_by_both:
+                vote = dict()
+                vote['proposition'] = proposition.proposition_type_initials + \
+                    ' ' + str(proposition.number) + '/' + str(proposition.year)
+                vote['user_vote'] = proposition.user_votes.filter(
+                    user=request.user
+                )[0].option
+                vote['parliamentary_vote'] = \
+                    proposition.parliamentary_votes.filter(
+                        parliamentary=response.data['id']
+                    )[0].option
+
+                parliamentarians_total_votes = \
+                    ParliamentaryVote.objects.filter(
+                        proposition=proposition
+                    )
+                try:
+                    parliamentarians_approval = \
+                        parliamentarians_total_votes.filter(
+                            option='Y'
+                        ).count() / parliamentarians_total_votes.count() * 100
+                except ZeroDivisionError:
+                    parliamentarians_approval = 0
+
+                population_total_votes = UserVote.objects.filter(
+                    proposition=proposition
+                )
+                try:
+                    population_approval = population_total_votes.filter(
+                        option='Y'
+                    ).count() / population_total_votes.count() * 100
+                except ZeroDivisionError:
+                    population_approval = 0
+
+                vote['parliamentarians_approval'] = \
+                    round(parliamentarians_approval, 2)
+                vote['population_approval'] = \
+                    round(population_approval, 2)
+
+                response.data['voted_by_both'].append(vote)
+
         return response
 
 
