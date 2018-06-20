@@ -707,7 +707,6 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-
     @detail_route(methods=['get'])
     def social_information_data(self, request, pk):
 
@@ -746,7 +745,6 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                 Q(option='A')
             ).count() / parliamentarians_total_votes.count() * 100, 2)
 
-
         # Population approval
         response['population_approval'] = dict()
         response['population_approval']['Y'] = round(
@@ -762,7 +760,6 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                 option='A'
             ).count() / population_total_votes.count() * 100, 2)
 
-        
         # Gender
         response['gender'] = dict()
         response['gender']['M'] = round(population_total_votes.filter(
@@ -780,7 +777,7 @@ class PropositionViewset(mixins.RetrieveModelMixin,
             Q(user__social_information__gender='O')
         ).count() / population_total_votes.count() * 100, 2)
 
-                    # Income
+        # Income
         response['income'] = dict()
         response['income']['E'] = round(population_total_votes.filter(
             user__social_information__income='E'
@@ -805,7 +802,7 @@ class PropositionViewset(mixins.RetrieveModelMixin,
             Q(user__social_information__income='A')
         ).count() / population_total_votes.count() * 100, 2)
 
-                    # Region
+        # Region
         response['region'] = dict()
         response['region']['N'] = round(population_total_votes.filter(
             user__social_information__region='N'
@@ -856,6 +853,8 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         ).count() / population_total_votes.count() * 100, 2)
 
         return Response(response, status=status.HTTP_200_OK)
+
+
 class UserVoteViewset(viewsets.ModelViewSet):
 
     serializer_class = UserVoteSerializer
