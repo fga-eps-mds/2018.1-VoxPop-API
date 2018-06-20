@@ -746,6 +746,22 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                     Q(option='A')
                 ).count() / parliamentarians_total_votes.count() * 100, 2)
 
+
+            # Population approval
+            response['population_approval'] = dict()
+            response['population_approval']['Y'] = round(
+                population_total_votes.filter(
+                    option='Y'
+                ).count() / population_total_votes.count() * 100, 2)
+            response['population_approval']['N'] = round(
+                population_total_votes.filter(
+                    option='N'
+                ).count() / population_total_votes.count() * 100, 2)
+            response['population_approval']['A'] = round(
+                population_total_votes.filter(
+                    option='A'
+                ).count() / population_total_votes.count() * 100, 2)
+                
             return Response(response, status=status.HTTP_200_OK)
 class UserVoteViewset(viewsets.ModelViewSet):
 
