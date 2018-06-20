@@ -780,6 +780,32 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                 Q(user__social_information__gender='O')
             ).count() / population_total_votes.count() * 100, 2)
 
+                        # Income
+            response['income'] = dict()
+            response['income']['E'] = round(population_total_votes.filter(
+                user__social_information__income='E'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['income']['D'] = round(population_total_votes.filter(
+                user__social_information__income='D'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['income']['C'] = round(population_total_votes.filter(
+                user__social_information__income='C'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['income']['B'] = round(population_total_votes.filter(
+                user__social_information__income='B'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['income']['A'] = round(population_total_votes.filter(
+                user__social_information__income='A'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['income']['null'] = round(population_total_votes.exclude(
+                Q(user__social_information__income='E') |
+                Q(user__social_information__income='D') |
+                Q(user__social_information__income='C') |
+                Q(user__social_information__income='B') |
+                Q(user__social_information__income='A')
+            ).count() / population_total_votes.count() * 100, 2)
+
+
             return Response(response, status=status.HTTP_200_OK)
 class UserVoteViewset(viewsets.ModelViewSet):
 
