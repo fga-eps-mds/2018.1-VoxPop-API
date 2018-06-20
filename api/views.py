@@ -8,7 +8,7 @@ from django.db.models import Count, Q
 
 from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
@@ -708,6 +708,45 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         return Response(serializer.data)
 
 
+    @detail_route(methods=['get'])
+        def social_information_data(self, request, pk):
+
+            response = dict()
+
+            parliamentarians_total_votes = ParliamentaryVote.objects.filter(
+                proposition=pk
+            )
+            population_total_votes = UserVote.objects.filter(
+                proposition=pk
+            )
+
+            if parliamentarians_total_votes == 0 or population_total_votes == 0:
+                return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+            response['proposition'] = pk
+
+            # Parliamentarians approval
+            response['parliamentarians_approval'] = dict()
+            response['parliamentarians_approval']['Y'] = round(
+                parliamentarians_total_votes.filter(
+                    option='Y'
+                ).count() / parliamentarians_total_votes.count() * 100, 2)
+            response['parliamentarians_approval']['N'] = round(
+                parliamentarians_total_votes.filter(
+                    option='N'
+                ).count() / parliamentarians_total_votes.count() * 100, 2)
+            response['parliamentarians_approval']['A'] = round(
+                parliamentarians_total_votes.filter(
+                    option='A'
+                ).count() / parliamentarians_total_votes.count() * 100, 2)
+            response['parliamentarians_approval']['others'] = round(
+                parliamentarians_total_votes.filter(
+                    Q(option='Y') |
+                    Q(option='N') |
+                    Q(option='A')
+                ).count() / parliamentarians_total_votes.count() * 100, 2)
+
+            return Response(response, status=status.HTTP_200_OK)
 class UserVoteViewset(viewsets.ModelViewSet):
 
     serializer_class = UserVoteSerializer
