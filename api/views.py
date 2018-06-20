@@ -761,7 +761,25 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                 population_total_votes.filter(
                     option='A'
                 ).count() / population_total_votes.count() * 100, 2)
-                
+
+            
+            # Gender
+            response['gender'] = dict()
+            response['gender']['M'] = round(population_total_votes.filter(
+                user__social_information__gender='M'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['gender']['F'] = round(population_total_votes.filter(
+                user__social_information__gender='F'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['gender']['O'] = round(population_total_votes.filter(
+                user__social_information__gender='O'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['gender']['null'] = round(population_total_votes.exclude(
+                Q(user__social_information__gender='M') |
+                Q(user__social_information__gender='F') |
+                Q(user__social_information__gender='O')
+            ).count() / population_total_votes.count() * 100, 2)
+
             return Response(response, status=status.HTTP_200_OK)
 class UserVoteViewset(viewsets.ModelViewSet):
 
