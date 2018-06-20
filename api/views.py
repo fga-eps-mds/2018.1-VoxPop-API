@@ -805,6 +805,30 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                 Q(user__social_information__income='A')
             ).count() / population_total_votes.count() * 100, 2)
 
+                        # Region
+            response['region'] = dict()
+            response['region']['N'] = round(population_total_votes.filter(
+                user__social_information__region='N'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['region']['NE'] = round(population_total_votes.filter(
+                user__social_information__region='NE'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['region']['CO'] = round(population_total_votes.filter(
+                user__social_information__region='CO'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['region']['SE'] = round(population_total_votes.filter(
+                user__social_information__region='SE'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['region']['S'] = round(population_total_votes.filter(
+                user__social_information__region='S'
+            ).count() / population_total_votes.count() * 100, 2)
+            response['region']['null'] = round(population_total_votes.exclude(
+                Q(user__social_information__region='N') |
+                Q(user__social_information__region='NE') |
+                Q(user__social_information__region='CO') |
+                Q(user__social_information__region='SE') |
+                Q(user__social_information__region='S')
+            ).count() / population_total_votes.count() * 100, 2)
 
             return Response(response, status=status.HTTP_200_OK)
 class UserVoteViewset(viewsets.ModelViewSet):
