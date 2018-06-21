@@ -765,15 +765,18 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         response['gender']['M'] = round(population_total_votes.filter(
                                         option='Y',
                                         user__social_information__gender='M'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['gender']['F'] = round(population_total_votes.filter(
                                         option='Y',
                                         user__social_information__gender='F'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['gender']['O'] = round(population_total_votes.filter(
                                         option='Y',
                                         user__social_information__gender='O'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['gender']['null'] = round(population_total_votes.exclude(
             Q(user__social_information__gender='M') |
             Q(user__social_information__gender='F') |
@@ -787,25 +790,29 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         response['income']['E'] = round(population_total_votes.filter(
                                         option='Y',
                                         user__social_information__income='E'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['income']['D'] = round(population_total_votes.filter(
                                         option='Y',
                                         user__social_information__income='D'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['income']['C'] = round(population_total_votes.filter(
                                         option='Y',
-            user__social_information__income='C'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        user__social_information__income='C'
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['income']['B'] = round(population_total_votes.filter(
-               option='Y',
-            user__social_information__income='B'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        option='Y',
+                                        user__social_information__income='B'
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['income']['A'] = round(population_total_votes.filter(
-               option='Y',
-            user__social_information__income='A'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        option='Y',
+                                        user__social_information__income='A'
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['income']['null'] = round(population_total_votes.exclude(
-@@ -99,23 +109,30 @@ class PropositionViewset(mixins.RetrieveModelMixin,
             Q(user__social_information__income='C') |
             Q(user__social_information__income='B') |
             Q(user__social_information__income='A')
@@ -818,25 +825,29 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         response['region']['N'] = round(population_total_votes.filter(
                                         option='Y',
                                         user__social_information__region='N'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['region']['NE'] = round(population_total_votes.filter(
                                         option='Y',
                                         user__social_information__region='NE'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['region']['CO'] = round(population_total_votes.filter(
                                         option='Y',
                                         user__social_information__region='CO'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['region']['SE'] = round(population_total_votes.filter(
                                         option='Y',
                                         user__social_information__region='SE'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['region']['S'] = round(population_total_votes.filter(
                                         option='Y',
                                         user__social_information__region='S'
-        ).count() / population_total_votes.count() * 100, 2)
+                                        ).count() / population_total_votes
+                                        .count() * 100, 2)
         response['region']['null'] = round(population_total_votes.exclude(
-@@ -124,23 +141,30 @@ class PropositionViewset(mixins.RetrieveModelMixin,
             Q(user__social_information__region='CO') |
             Q(user__social_information__region='SE') |
             Q(user__social_information__region='S')
@@ -867,7 +878,6 @@ class PropositionViewset(mixins.RetrieveModelMixin,
             user__social_information__race='I'
         ).count() / population_total_votes.count() * 100, 2)
         response['race']['null'] = round(population_total_votes.exclude(
-@@ -149,6 +173,8 @@ class PropositionViewset(mixins.RetrieveModelMixin,
             Q(user__social_information__race='A') |
             Q(user__social_information__race='PA') |
             Q(user__social_information__race='I')
@@ -875,7 +885,7 @@ class PropositionViewset(mixins.RetrieveModelMixin,
                option='Y'
         ).count() / population_total_votes.count() * 100, 2)
 
-        return Response(response, status=status.HTTP_200_OK) 
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class UserVoteViewset(viewsets.ModelViewSet):
