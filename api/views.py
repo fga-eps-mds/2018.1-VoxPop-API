@@ -28,7 +28,9 @@ from .utils import (
     propositions_filter,
     user_votes_filter,
     user_following_filter,
-    update_compatibility
+    update_compatibility,
+    calc_charts_social_info,
+    calc_charts_totals_info
 )
 
 
@@ -725,165 +727,48 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         response['proposition'] = pk
 
         # Parliamentarians approval
-        response['parliamentarians_approval'] = dict()
-        response['parliamentarians_approval']['Y'] = round(
-            parliamentarians_total_votes.filter(
-                option='Y'
-            ).count() / parliamentarians_total_votes.count() * 100, 2)
-        response['parliamentarians_approval']['N'] = round(
-            parliamentarians_total_votes.filter(
-                option='N'
-            ).count() / parliamentarians_total_votes.count() * 100, 2)
-        response['parliamentarians_approval']['A'] = round(
-            parliamentarians_total_votes.filter(
-                option='A'
-            ).count() / parliamentarians_total_votes.count() * 100, 2)
-        response['parliamentarians_approval']['others'] = round(
-            parliamentarians_total_votes.filter(
-                Q(option='Y') |
-                Q(option='N') |
-                Q(option='A')
-            ).count() / parliamentarians_total_votes.count() * 100, 2)
-
+        response['parliamentarians_total_votes'] = calc_charts_totals_info(
+            parliamentarians_total_votes
+        )
         # Population approval
-        response['population_approval'] = dict()
-        response['population_approval']['Y'] = round(
-            population_total_votes.filter(
-                option='Y'
-            ).count() / population_total_votes.count() * 100, 2)
-        response['population_approval']['N'] = round(
-            population_total_votes.filter(
-                option='N'
-            ).count() / population_total_votes.count() * 100, 2)
-        response['population_approval']['A'] = round(
-            population_total_votes.filter(
-                option='A'
-            ).count() / population_total_votes.count() * 100, 2)
-
-        # Gender
-        response['gender'] = dict()
-        response['gender']['M'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__gender='M'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['gender']['F'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__gender='F'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['gender']['O'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__gender='O'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['gender']['null'] = round(population_total_votes.exclude(
-            Q(user__social_information__gender='M') |
-            Q(user__social_information__gender='F') |
-            Q(user__social_information__gender='O')
-            ).filter(
-                option='Y'
-        ).count() / population_total_votes.count() * 100, 2)
-
-        # Income
-        response['income'] = dict()
-        response['income']['E'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__income='E'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['income']['D'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__income='D'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['income']['C'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__income='C'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['income']['B'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__income='B'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['income']['A'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__income='A'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['income']['null'] = round(population_total_votes.exclude(
-            Q(user__social_information__income='C') |
-            Q(user__social_information__income='B') |
-            Q(user__social_information__income='A')
-           ).filter(
-               option='Y'
-        ).count() / population_total_votes.count() * 100, 2)
+        response['population_total_votes'] = calc_charts_totals_info(
+            population_total_votes
+        )
 
         # Region
-        response['region'] = dict()
-        response['region']['N'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__region='N'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['region']['NE'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__region='NE'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['region']['CO'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__region='CO'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['region']['SE'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__region='SE'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['region']['S'] = round(population_total_votes.filter(
-                                        option='Y',
-                                        user__social_information__region='S'
-                                        ).count() / population_total_votes
-                                        .count() * 100, 2)
-        response['region']['null'] = round(population_total_votes.exclude(
-            Q(user__social_information__region='CO') |
-            Q(user__social_information__region='SE') |
-            Q(user__social_information__region='S')
-            ).filter(
-            option='Y'
-        ).count() / population_total_votes.count() * 100, 2)
+        response['region'] = calc_charts_social_info(
+            population_total_votes,
+            'user__social_information__region',
+            ['N', 'NE', 'CO', 'SE', 'S', None]
+        )
+
+        # Income
+        response['income'] = calc_charts_social_info(
+            population_total_votes,
+            'user__social_information__income',
+            ['E', 'D', 'C', 'B', 'A', None]
+        )
+
+        # Education
+        response['education'] = calc_charts_social_info(
+            population_total_votes,
+            'user__social_information__education',
+            ['SE', 'EF', 'EM', 'ES', 'PG', None]
+        )
 
         # Race
-        response['race'] = dict()
-        response['race']['B'] = round(population_total_votes.filter(
-            option='Y',
-            user__social_information__race='B'
-        ).count() / population_total_votes.count() * 100, 2)
-        response['race']['PR'] = round(population_total_votes.filter(
-            option='Y',
-            user__social_information__race='PR'
-        ).count() / population_total_votes.count() * 100, 2)
-        response['race']['A'] = round(population_total_votes.filter(
-            option='Y',
-            user__social_information__race='A'
-        ).count() / population_total_votes.count() * 100, 2)
-        response['race']['PA'] = round(population_total_votes.filter(
-            option='Y',
-            user__social_information__race='PA'
-        ).count() / population_total_votes.count() * 100, 2)
-        response['race']['I'] = round(population_total_votes.filter(
-            option='Y',
-            user__social_information__race='I'
-        ).count() / population_total_votes.count() * 100, 2)
-        response['race']['null'] = round(population_total_votes.exclude(
-            Q(user__social_information__race='A') |
-            Q(user__social_information__race='PA') |
-            Q(user__social_information__race='I')
-            ).filter(
-               option='Y'
-        ).count() / population_total_votes.count() * 100, 2)
+        response['race'] = calc_charts_social_info(
+            population_total_votes,
+            'user__social_information__race',
+            ['B', 'PR', 'A', 'PA', 'I', None]
+        )
+
+        # Gender
+        response['gender'] = calc_charts_social_info(
+            population_total_votes,
+            'user__social_information__gender',
+            ['M', 'F', 'O', None]
+        )
 
         return Response(response, status=status.HTTP_200_OK)
 
