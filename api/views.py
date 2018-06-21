@@ -956,7 +956,8 @@ class PropositionViewset(mixins.RetrieveModelMixin,
             proposition=pk
         )
 
-        if parliamentarians_total_votes == 0 or population_total_votes == 0:
+        if parliamentarians_total_votes.count() == 0 \
+                or population_total_votes.count() == 0:
             return Response(response, status=status.HTTP_404_NOT_FOUND)
 
         response['proposition'] = pk
@@ -965,6 +966,7 @@ class PropositionViewset(mixins.RetrieveModelMixin,
         response['parliamentarians_total_votes'] = calc_charts_totals_info(
             parliamentarians_total_votes
         )
+
         # Population approval
         response['population_total_votes'] = calc_charts_totals_info(
             population_total_votes

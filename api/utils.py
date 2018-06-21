@@ -1,5 +1,5 @@
-from api.models import Compatibility, Parliamentary
-from api.models import ParliamentaryVote
+from api.models import Compatibility, Parliamentary, ParliamentaryVote
+
 from django.db.models import Count, F, Q
 
 
