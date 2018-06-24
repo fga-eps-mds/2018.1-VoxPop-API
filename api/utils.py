@@ -207,7 +207,7 @@ def calc_charts_totals_info(total_queryset):
     if isinstance(total_queryset[0], ParliamentaryVote):
         response['others'] = round(
             (
-                total_queryset.filter(
+                total_queryset.exclude(
                     Q(option='Y') |
                     Q(option='N') |
                     Q(option='A')
