@@ -128,9 +128,9 @@ $ ng serve
 Por ultimo va no browser do seu computador, e digite no navegador o endereço:
 http://localhost:4200
 
-## Licensa
+## Licença
 
-O projeto utiliza a licensa GNU General Public License v3.0, [confira aqui](https://github.com/fga-gpp-mds/2018.1-VoxPop-API/blob/master/LICENSE)
+O projeto utiliza a licença GNU General Public License v3.0, [confira aqui](https://github.com/fga-gpp-mds/2018.1-VoxPop-API/blob/master/LICENSE)
 
 ## Mais informações
 
@@ -145,18 +145,3 @@ Para mais informações sobre o projeto, veja a documentação completa aqui: [V
 * ![Online](https://img.shields.io/badge/STATUS-Online-green.svg) **--->** [**WebApp de Homologação [http://hml.voxpop.ml]**](http://hml.voxpop.ml)
 * ![Online](https://img.shields.io/badge/STATUS-Online-green.svg) **--->** [**API de Produção [http://api.voxpop.ml]**](http://hml.api.voxpop.ml)
 * ![Online](https://img.shields.io/badge/STATUS-Online-green.svg) **--->** [**WebApp de Produção [http://voxpop.ml]**](http://hml.voxpop.ml)
-
-## Nosso time
-
-| | **Nome** | **E-mail** | **GitHub** |
-|-|------|--------|--------|
-|![André Bedran](https://avatars1.githubusercontent.com/u/5595312?s=100&v=4)|André Bedran|affbedran@gmail.com|[affbedran](https://github.com/affbedran)|
-| ![Breno Mariz](https://avatars3.githubusercontent.com/u/21313218?v=4&s=100)| Breno Mariz | breno-mariz@gmail.com | [breno-mariz](https://github.com/breno-mariz) |
-|![Eduardo Lima](https://avatars0.githubusercontent.com/u/26698993?s=100&v=4)|Eduardo Lima|eduardolimrib@gmail.com|[Eduardolimr](https://github.com/Eduardolimr) |
-|![Érico Bandeira](https://avatars0.githubusercontent.com/u/26394460?s=100&v=4)|Érico Bandeira|ericobandeira@hotmail.com|[ericGOD24](https://github.com/ericGOD24) |
-|![Filipe Toyoshima](https://avatars3.githubusercontent.com/u/29482983?s=100&v=4)|Filipe Toyoshima|filipetoyoshima@gmail.com|[filipetoyoshima](https://github.com/filipetoyoshima) |
-|![Kleber Brito](https://avatars2.githubusercontent.com/u/8596276?s=100&v=4)|Kleber Brito|kleberbritomoreira10@gmail.com|[kleberbritomoreira10](https://github.com/kleberbritomoreira10) |
-|![Lucas Vitor](https://avatars1.githubusercontent.com/u/27078392?s=100&v=4)|Lucas Vitor|lucasvitorifg@gmail.com|[Lucas362](https://github.com/Lucas362) |
-|![Mateus de Morais](https://avatars1.githubusercontent.com/u/20940145?s=100&v=4)|Mateus de Morais|mateusmorais78@gmail.com|[mateusdemorais](https://github.com/mateusdemorais) |
-|![Rossicler](https://avatars1.githubusercontent.com/u/29635581?s=100&v=4)|Rossicler|rossiclerjr@gmail.com|[rossicler](https://github.com/rossicler) |
-|![Samuel Borges](https://avatars0.githubusercontent.com/u/23219524?s=100&v=4)|Samuel Borges|samuelmordred@gmail.com|[SamuelMordred](https://github.com/SamuelMordred) |
