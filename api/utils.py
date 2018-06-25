@@ -1,4 +1,4 @@
-from api.models import Compatibility, Parliamentary
+from api.models import Compatibility, Parliamentary, ParliamentaryVote
 
 from django.db.models import Count, F, Q
 
@@ -185,3 +185,83 @@ def update_compatibility(self):
         self.request.user.compatibilities.all().delete()
 
         Compatibility.objects.bulk_create(compatibilities)
+
+
+def calc_charts_totals_info(total_queryset):
+
+    response = dict()
+
+    answers_list = ['Y', 'N', 'A']
+
+    for answer in answers_list:
+
+        response[answer] = round(
+            (
+                total_queryset.filter(
+                    option=answer
+                ).count() / total_queryset.count() * 100
+            ),
+            2
+        )
+
+    if isinstance(total_queryset[0], ParliamentaryVote):
+        response['others'] = round(
+            (
+                total_queryset.exclude(
+                    Q(option='Y') |
+                    Q(option='N') |
+                    Q(option='A')
+                ).count() / total_queryset.count() * 100
+            ),
+            2
+        )
+
+    response['count'] = total_queryset.count()
+
+    return response
+
+
+def calc_charts_social_info(population_total_votes,
+                            filter_arg,
+                            options_list):
+
+    population_approval = population_total_votes.filter(option='Y')
+    population_disapproval = population_total_votes.filter(option='N')
+    population_abstention = population_total_votes.filter(option='A')
+
+    response = dict()
+
+    answers_list = [('Y', population_approval),
+                    ('N', population_disapproval),
+                    ('A', population_abstention)]
+
+    for option in options_list:
+
+        response[option] = dict()
+
+        if population_total_votes.filter(
+                **{filter_arg: option}
+        ).count() > 0:
+
+            for answer, queryset in answers_list:
+                response[option][answer] = round(
+                    (
+                        queryset.filter(
+                            **{filter_arg: option}
+                        ).count() /
+                        population_total_votes.filter(
+                            **{filter_arg: option}
+                        ).count() * 100
+                    ),
+                    2
+                )
+            response[option]['count'] = population_total_votes.filter(
+                **{filter_arg: option}
+            ).count()
+
+        else:
+            for answer, queryset in answers_list:
+                response[option][answer] = 0.0
+            response[option]['count'] = 0
+
+    return response

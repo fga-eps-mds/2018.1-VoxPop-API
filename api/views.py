@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
@@ -30,7 +30,9 @@ from .utils import (
     propositions_filter,
     user_votes_filter,
     user_following_filter,
-    update_compatibility
+    update_compatibility,
+    calc_charts_social_info,
+    calc_charts_totals_info
 )
 
 
@@ -676,6 +678,52 @@ class ParliamentaryViewset(mixins.RetrieveModelMixin,
             )[0].compatibility
             response.data['compatibility'] = round(compatibility, 2)
 
+            response.data['voted_by_both'] = list()
+            voted_by_both = Proposition.objects.filter(
+                user_votes__user=request.user,
+                parliamentary_votes__parliamentary=response.data['id']
+            )
+            for proposition in voted_by_both:
+                vote = dict()
+                vote['proposition'] = proposition.proposition_type_initials + \
+                    ' ' + str(proposition.number) + '/' + str(proposition.year)
+                vote['user_vote'] = proposition.user_votes.filter(
+                    user=request.user
+                )[0].option
+                vote['parliamentary_vote'] = \
+                    proposition.parliamentary_votes.filter(
+                        parliamentary=response.data['id']
+                    )[0].option
+
+                parliamentarians_total_votes = \
+                    ParliamentaryVote.objects.filter(
+                        proposition=proposition
+                    )
+                try:
+                    parliamentarians_approval = \
+                        parliamentarians_total_votes.filter(
+                            option='Y'
+                        ).count() / parliamentarians_total_votes.count() * 100
+                except ZeroDivisionError:
+                    parliamentarians_approval = 0
+
+                population_total_votes = UserVote.objects.filter(
+                    proposition=proposition
+                )
+                try:
+                    population_approval = population_total_votes.filter(
+                        option='Y'
+                    ).count() / population_total_votes.count() * 100
+                except ZeroDivisionError:
+                    population_approval = 0
+
+                vote['parliamentarians_approval'] = \
+                    round(parliamentarians_approval, 2)
+                vote['population_approval'] = \
+                    round(population_approval, 2)
+
+                response.data['voted_by_both'].append(vote)
+
         return response
 
 
@@ -895,6 +943,71 @@ class PropositionViewset(mixins.RetrieveModelMixin,
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    @detail_route(methods=['get'])
+    def social_information_data(self, request, pk):
+
+        response = dict()
+
+        parliamentarians_total_votes = ParliamentaryVote.objects.filter(
+            proposition=pk
+        )
+        population_total_votes = UserVote.objects.filter(
+            proposition=pk
+        )
+
+        if parliamentarians_total_votes.count() == 0 \
+                or population_total_votes.count() == 0:
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+        response['proposition'] = pk
+
+        # Parliamentarians approval
+        response['parliamentarians_total_votes'] = calc_charts_totals_info(
+            parliamentarians_total_votes
+        )
+
+        # Population approval
+        response['population_total_votes'] = calc_charts_totals_info(
+            population_total_votes
+        )
+
+        # Region
+        response['region'] = calc_charts_social_info(
+            population_total_votes,
+            'user__social_information__region',
+            ['N', 'NE', 'CO', 'SE', 'S', None]
+        )
+
+        # Income
+        response['income'] = calc_charts_social_info(
+            population_total_votes,
+            'user__social_information__income',
+            ['E', 'D', 'C', 'B', 'A', None]
+        )
+
+        # Education
+        response['education'] = calc_charts_social_info(
+            population_total_votes,
+            'user__social_information__education',
+            ['SE', 'EF', 'EM', 'ES', 'PG', None]
+        )
+
+        # Race
+        response['race'] = calc_charts_social_info(
+            population_total_votes,
+            'user__social_information__race',
+            ['B', 'PR', 'A', 'PA', 'I', None]
+        )
+
+        # Gender
+        response['gender'] = calc_charts_social_info(
+            population_total_votes,
+            'user__social_information__gender',
+            ['M', 'F', 'O', None]
+        )
+
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class UserVoteViewset(viewsets.ModelViewSet):
